@@ -41,13 +41,36 @@ const Index = () => {
     fetchStyles();
   }, []);
 
-  const setTextInput = (v, key) => {
-    const index = list[key];
-
+  const setTextInput = (newValue, keyIndex) => {
     const preResult = {
-      Id_Checking_Process: index.Id_Checking_Process,
-      Examination_Result: v,
+      Id_Checking_Process: keyIndex,
+      value: newValue,
     };
+
+    const newResult = result.map((item, index) => {
+      item.Id_Checking_Process === keyIndex
+        ? [...result, (result[index] = preResult)]
+        : [...result, preResult];
+    });
+
+    // const updateText = result.map((item, i) => ({
+    //   ...item,
+    //   value:
+    //     i.Id_Checking_Process === keyIndex
+    //       ? preResult
+    //       : (item.value = newValue),
+    // }));
+
+    setResult(newResult);
+
+    console.log(result);
+
+    // const index = list[keyIndex];
+
+    // const preResult = {
+    //   Id_Checking_Process: index.Id_Checking_Process,
+    //   Examination_Result: v,
+    // };
 
     // const t = [
     //   ...result,
@@ -62,16 +85,7 @@ const Index = () => {
     // setResult(t);
     // console.log(result);
   };
-  const thorwData = (content , title , keyCheck , data) => {
-    const thorwData = {
-      content,
-      title,
-      keyCheck,
-      data
-    }
-    return thorwData
-  }
-  
+
   const postData = async (data) => {
     console.log(data);
   };
@@ -88,17 +102,14 @@ const Index = () => {
           <View key={index}>
             {item.Name_Field_Group === "TEXT_INPUT" ? (
               <TextInputComponent
-                data={{item,index,list}}
+                data={{ item, index, list }}
                 updateText={(newValue, keyIndex) =>
                   setTextInput(newValue, keyIndex)
                 }
               />
             ) : item.Name_Field_Group === "CHECK_BOX" ? (
               <CheckBoxComponent
-                content={item.Subdetail}
-                title={item.Name_Checking_Process}
-                keyCheck={index}
-                data={list}
+                data={{ item, index, list }}
                 updateList={(newList) => setList(newList)}
               />
             ) : null}

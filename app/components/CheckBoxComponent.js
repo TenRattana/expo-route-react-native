@@ -3,10 +3,9 @@ import { View, TouchableOpacity, Text, FlatList } from "react-native";
 import Checkbox from "expo-checkbox";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const CheckBoxComponent = (props) => {
-  console.log(props);
-  
-  const { title, content, keyCheck, data, updateList } = data
+const CheckBoxComponent = ({ data, updateList }) => {
+  const { item, index, list } = data;
+  const { Subdetail, Name_Checking_Process } = item;
   const [styles, setStyles] = useState({});
 
   useEffect(() => {
@@ -22,7 +21,7 @@ const CheckBoxComponent = (props) => {
   }, []);
 
   const updateCheckbox = (newValue, id, index) => {
-    const newData = [...data];
+    const newData = [...list];
 
     const subdetailIndex = newData[index].Subdetail.findIndex(
       (item) => item.Id_Inspection_Order === id
@@ -40,17 +39,17 @@ const CheckBoxComponent = (props) => {
 
   return (
     <View>
-      <Text style={styles.textContent}>{title}</Text>
+      <Text style={styles.textContent}>{Name_Checking_Process}</Text>
 
       <FlatList
-        data={content}
+        data={Subdetail}
         renderItem={({ item }) => (
           <TouchableOpacity style={styles.contarinerList}>
             <Checkbox
               style={styles.checkbox}
               value={Boolean(item.Value_Check_Box)}
               onValueChange={(newValue) =>
-                updateCheckbox(newValue, item.Id_Inspection_Order, keyCheck)
+                updateCheckbox(newValue, item.Id_Inspection_Order, index)
               }
               color={item.value ? "#4630EB" : undefined}
             />

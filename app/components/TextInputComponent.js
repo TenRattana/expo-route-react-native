@@ -2,9 +2,10 @@ import React, { useState, useEffect } from "react";
 import { View, TextInput, Text } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const TextInputComponent = ({ data }) => {
+const TextInputComponent = ({ data, updateText }) => {
   const { item, index, list } = data;
-  const { Subdetail, Name_Checking_Process } = item;
+  const { Name_Checking_Process } = item;
+  
   const [styles, setStyles] = useState({});
   const [input, setInput] = useState();
 
