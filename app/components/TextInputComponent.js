@@ -2,12 +2,14 @@ import React, { useState, useEffect } from "react";
 import { View, TextInput, Text } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const TextInputComponent = ({ title, keyCheck, data , updateText}) => {
+const TextInputComponent = ({ data }) => {
+  const { item, index, list } = data;
+  const { Subdetail, Name_Checking_Process } = item;
   const [styles, setStyles] = useState({});
   const [input, setInput] = useState();
 
   useEffect(() => {
-    updateText(input , keyCheck)
+    updateText(input, index);
   }, [input]);
 
   useEffect(() => {
@@ -24,7 +26,7 @@ const TextInputComponent = ({ title, keyCheck, data , updateText}) => {
 
   return (
     <View>
-      <Text style={styles.textContent}>{title}</Text>
+      <Text style={styles.textContent}>{Name_Checking_Process}</Text>
 
       <TextInput
         style={styles.inputText}

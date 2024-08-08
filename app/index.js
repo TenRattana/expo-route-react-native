@@ -44,22 +44,34 @@ const Index = () => {
   const setTextInput = (v, key) => {
     const index = list[key];
 
-    setResult([
-      ...result,
-      result.map((item) => {
-        item.Id_Checking_Process === index.Id_Checking_Process
-          ? {
-              value: v,
-              Id_Checking_Process: index.Id_Checking_Process,
-              Id_Machine_Group: index.Id_Machine_Group,
-            }
-          : result;
-      }),
-    ]);
+    const preResult = {
+      Id_Checking_Process: index.Id_Checking_Process,
+      Examination_Result: v,
+    };
 
-    console.log(result);
+    // const t = [
+    //   ...result,
+    //   result.map((item) => ({
+    //     item:
+    //       item.Id_Checking_Process == preResult.Id_Checking_Process
+    //         ? preResult
+    //         : item,
+    //   })),
+    // ];
+
+    // setResult(t);
+    // console.log(result);
   };
-
+  const thorwData = (content , title , keyCheck , data) => {
+    const thorwData = {
+      content,
+      title,
+      keyCheck,
+      data
+    }
+    return thorwData
+  }
+  
   const postData = async (data) => {
     console.log(data);
   };
@@ -76,11 +88,10 @@ const Index = () => {
           <View key={index}>
             {item.Name_Field_Group === "TEXT_INPUT" ? (
               <TextInputComponent
-                content={item.Subdetail}
-                title={item.Name_Checking_Process}
-                keyCheck={index}
-                data={list}
-                updateText={(v, k) => setTextInput(v, k)}
+                data={{item,index,list}}
+                updateText={(newValue, keyIndex) =>
+                  setTextInput(newValue, keyIndex)
+                }
               />
             ) : item.Name_Field_Group === "CHECK_BOX" ? (
               <CheckBoxComponent

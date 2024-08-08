@@ -3,7 +3,10 @@ import { View, TouchableOpacity, Text, FlatList } from "react-native";
 import Checkbox from "expo-checkbox";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const CheckBoxComponent = ({ title, content, keyCheck, data, updateList }) => {
+const CheckBoxComponent = (props) => {
+  console.log(props);
+  
+  const { title, content, keyCheck, data, updateList } = data
   const [styles, setStyles] = useState({});
 
   useEffect(() => {
