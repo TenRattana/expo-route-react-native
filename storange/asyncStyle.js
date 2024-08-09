@@ -15,6 +15,10 @@ const text_input = {
     paddingLeft: 20,
     margin: 8,
   },
+  errorText: {
+    color: 'red',
+    marginTop: 4,
+  },
 };
 
 const check_box = {

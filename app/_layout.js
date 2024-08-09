@@ -12,10 +12,14 @@ export default function Layout() {
         headerTitleStyle: {
           fontWeight: "bold",
         },
-        headerTransparent: true,
+        headerTransparent: false, 
+        headerShown: true,
       }}
     >
-        <Stack.Screen name="index" options={{ title: 'KFM ตารางเช็คเครื่องจักร' }} />
+      <Stack.Screen
+        name="index"
+        options={{ title: 'KFM ตารางเช็คเครื่องจักร' }}
+      />
     </Stack>
   );
 }
