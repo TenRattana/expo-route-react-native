@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { View, TextInput, Text, StyleSheet } from "react-native";
+import { View, TextInput, Text } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import validator from "validator";
 
-const TextInputComponent = ({ data, updateText }) => {
+const TextInputComponent = ({ data, updateText , validation }) => {
   const { item, index, list } = data;
-  const { Name_Checking_Process, Value_Check_Box } = item;
+  const { Name_Checking_Process, Value_Check_Box , Required } = item;
 
   const [styles, setStyles] = useState({});
   const [input, setInput] = useState(Value_Check_Box);
@@ -27,7 +27,7 @@ const TextInputComponent = ({ data, updateText }) => {
   const handleInputChange = (text) => {
     let errorMessage = "";
 
-    if (validator.isEmpty(text.trim())) {
+    if (validator.isEmpty(text.trim()) && Required) {
       errorMessage = `The ${Name_Checking_Process} field is required.`;
     } 
 
@@ -36,7 +36,7 @@ const TextInputComponent = ({ data, updateText }) => {
 
     if (!errorMessage) {
       const updatedList = [...list];
-      updatedList[index] = { ...updatedList[index], Value_Check_Box: text };
+      updatedList[index] = { ...updatedList[index], Value: text };
       updateText(updatedList);
     }
   };

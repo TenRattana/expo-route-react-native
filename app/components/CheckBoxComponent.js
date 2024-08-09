@@ -30,7 +30,7 @@ const CheckBoxComponent = ({ data, updateList }) => {
     if (subdetailIndex !== -1) {
       newData[index].Subdetail[subdetailIndex] = {
         ...newData[index].Subdetail[subdetailIndex],
-        Value_Check_Box: newValue ? 1 : 0,
+        Value: newValue ? 1 : 0,
       };
     }
 
@@ -47,7 +47,7 @@ const CheckBoxComponent = ({ data, updateList }) => {
           <TouchableOpacity style={styles.contarinerList}>
             <Checkbox
               style={styles.checkbox}
-              value={Boolean(item.Value_Check_Box)}
+              value={Boolean(item.Value)}
               onValueChange={(newValue) =>
                 updateCheckbox(newValue, item.Id_Inspection_Order, index)
               }

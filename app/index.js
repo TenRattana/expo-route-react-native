@@ -38,8 +38,39 @@ const Index = () => {
     getData();
   }, []);
 
-  const postData = async (data) => {
-    console.log("Submitting data:", data);
+  const validation = (error) => {
+    console.log(error);
+  };
+
+  const postData = async (datas) => {
+    datas = datas.map((e) => ({
+      Id_Checking_Process: e.Id_Checking_Process,
+      Id_Inspection_Order: e.Id_Inspection_Order,
+      Value: e.Value,
+      Subdetail: e.Subdetail,
+    }));
+    
+    let data = {
+      Odata: datas
+    };
+
+    console.log(data.Odata[2]);
+    
+    // let config = {
+    //   method: "post",
+    //   url: "InsertFormMachine",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    //   data: data,
+    // };
+
+    // try {
+    //   const response = await axios.request(config);
+    //   console.log(response.data);
+    // } catch (error) {
+    //   console.error("Error fetching data:", error);
+    // }
   };
 
   return (
@@ -56,11 +87,12 @@ const Index = () => {
               <TextInputComponent
                 data={{ item, index, list }}
                 updateText={setList}
+                validation={validation}
               />
             ) : item.Name_Field_Group === "CHECK_BOX" ? (
               <CheckBoxComponent
                 data={{ item, index, list }}
-                updateList={setList} 
+                updateList={setList}
               />
             ) : null}
           </View>
