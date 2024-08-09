@@ -3,7 +3,7 @@ import { View, TextInput, Text } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import validator from "validator";
 
-const TextInputComponent = ({ data, updateText , validation }) => {
+const TextInputComponent = ({ data, updateText }) => {
   const { item, index, list } = data;
   const { Name_Checking_Process, Value_Check_Box , Required } = item;
 

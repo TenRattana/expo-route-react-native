@@ -20,7 +20,7 @@ const CheckBoxComponent = ({ data, updateList }) => {
     fetchStyles();
   }, []);
 
-  const updateCheckbox = (newValue, id, index) => {
+  const handleCheckBoxChange = (newValue, id) => {
     const newData = [...list];
 
     const subdetailIndex = newData[index].Subdetail.findIndex(
@@ -49,7 +49,7 @@ const CheckBoxComponent = ({ data, updateList }) => {
               style={styles.checkbox}
               value={Boolean(item.Value)}
               onValueChange={(newValue) =>
-                updateCheckbox(newValue, item.Id_Inspection_Order, index)
+                handleCheckBoxChange(newValue, item.Id_Inspection_Order)
               }
               color={item.value ? "#4630EB" : undefined}
             />
