@@ -8,8 +8,8 @@
 
 | MachineID | MachineName |
 |-----------|-------------|
-| 1         | CNC Lathe    |
-| 2         | 3D Printer   |
+| 1         | SEPARATOR |
+| 2         | MILL A   |
 
 ### `QuestionMachines`
 - **QuestionID**: (Primary Key) รหัสคำถามที่ใช้ในการระบุคำถามแต่ละข้อ
@@ -22,8 +22,8 @@
 
 | QuestionID | QuestionName               | QuestionType | QuestionDataType | DisplayOrder |
 |------------|----------------------------|--------------|------------------|--------------|
-| 1          | What is the machine type?  | Text         | String           | 1            |
-| 2          | Select machine options     | Dropdown     | Integer          | 2            |
+| 1          | ปัญหาที่พบ  | Text         | String           | 1            |
+| 2          | ช่องระบาย A ข้าวดีปนหรือไม่    | Dropdown     | Integer          | 2            |
 
 ### `QuestionOptions`
 - **OptionID**: (Primary Key) รหัสตัวเลือกที่ใช้ในการระบุแต่ละตัวเลือก
@@ -36,8 +36,8 @@
 
 | OptionID | QuestionID | OptionName   | OptionValue | DisplayOrder |
 |----------|------------|--------------|-------------|--------------|
-| 1        | 2          | Option A     | 1           | 1            |
-| 2        | 2          | Option B     | 2           | 2            |
+| 1        | 2          | ปน     | 1           | 1            |
+| 2        | 2          | ไม่ปน     | 2           | 2            |
 
 ### `QuestionType`
 - **TypeID**: (Primary Key) รหัสประเภทคำถามที่ใช้ในการระบุประเภทคำถาม
@@ -48,8 +48,8 @@
 
 | TypeID | TypeName  | Description        |
 |--------|-----------|--------------------|
-| 1      | Dropdown  | Single selection   |
-| 2      | Text      | Free text input    |
+| 1      | DROPDOWN  | Single selection   |
+| 2      | TEXT_INPUT      | Free text input    |
 
 ### `ValidationRules`
 - **RuleID**: (Primary Key) รหัสกฎที่ใช้ในการระบุแต่ละกฎ
@@ -85,7 +85,7 @@
 
 | FormID | FormName      |
 |--------|---------------|
-| 1      | Machine Setup |
+| 1      | Check Machine |
 | 2      | Maintenance   |
 
 ### `ExpectedResult`
@@ -99,8 +99,8 @@
 
 | ExpectedResultID | MachineID | QuestionID | ExpectedResult | CreateDate |
 |------------------|-----------|------------|----------------|------------|
-| 1                | 1         | 1          | CNC Lathe      | 2024-08-01 |
-| 2                | 1         | 2          | Option A       | 2024-08-01 |
+| 1                | 1         | 1          | เจอจระเข้ในเครื่อง      | 2024-08-01 |
+| 2                | 1         | 2          | ปน      | 2024-08-01 |
 
 ---
 
