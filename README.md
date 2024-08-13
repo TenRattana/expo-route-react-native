@@ -1,7 +1,6 @@
 Machine
 -MachineID: รหัสเครื่องจักร
 -MachineName: ชื่อเครื่องจักร
--CreateDate: วันที่สร้าง
 
 QuestionMachines
 -QuestionID: รหัสคำถาม
