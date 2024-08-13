@@ -4,6 +4,7 @@ import {
   Text,
   FlatList,
   StyleSheet,
+  TouchableOpacity,
 } from "react-native";
 import axios from "../config/axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -44,38 +45,52 @@ const Index = () => {
       flex: 1,
       padding: themes.spacing ? themes.spacing.medium : 16,
     },
-    textContent: {
+    textHeader: {
       fontSize: themes.fontSizes ? themes.fontSizes.extraLarge : 24,
       alignSelf: "center",
       margin: themes.spacing ? themes.spacing.small : 8,
     },
-    buttonSubmit: {
-      marginTop: 40,
-      width: "50%",
-      height: 40,
-      alignSelf: "center",
-      justifyContent: "center",
-      alignItems: "center",
+    textContent: {
+      fontSize: themes.fontSizes ? themes.fontSizes.medium : 16,
+      margin: themes.spacing ? themes.spacing.small : 8,
+      marginTop: themes.spacing ? themes.spacing.large : 20,
+      color: themes.colors ? themes.colors.text : "#000",
+    },
+    buttonTouche: {
+      width: "30%",
+      margin: themes.spacing ? themes.spacing.small : 8,
+      height: 35,
       borderRadius: 10,
       elevation: 3,
       backgroundColor: themes.colors ? themes.colors.dark : "#000",
+
+      textInTouche: {
+        fontSize: themes.fontSizes ? themes.fontSizes.medium : 16,
+        color: themes.colors ? themes.colors.light : "#fff",
+        alignSelf: "center",
+        padding: themes.spacing ? themes.spacing.small : 8,
+      },
     },
-    fixToText: {
-      color: themes.colors ? themes.colors.surface : "#fff",
-      fontSize: themes.fontSizes ? themes.fontSizes.medium : 16,
-    },
+    
   });
 
   return (
     <View style={styles.container}>
-      <Text style={styles.textContent}>KFM ตารางตรวจเช็คเครื่องจักร </Text>
+      <Text style={styles.textHeader}>KFM ตารางตรวจเช็คเครื่องจักร </Text>
       <FlatList
         data={list}
         keyExtractor={(item) => item.MachineID.toString()}
         renderItem={({ item }) => (
-          <View>
-            <Text>{item.MachineID}</Text>
-          </View>
+          <TouchableOpacity
+            style={styles.buttonTouche}
+            onPress={() =>
+              navigation.navigate("DetailMachine", {
+                machineId: item.MachineID,
+              })
+            }
+          >
+            <Text style={styles.buttonTouche.textInTouche}>{item.MachineName}</Text>
+          </TouchableOpacity>
         )}
       />
     </View>
