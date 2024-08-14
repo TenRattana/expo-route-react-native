@@ -8,8 +8,8 @@
 
 | MachineID | MachineName |
 |-----------|-------------|
-| 1         | SEPARATOR |
-| 2         | MILL A   |
+| M0001         | SEPARATOR |
+| M0002         | MILL A   |
 
 ### `QuestionMachines`
 - **QuestionID**: (Primary Key) รหัสคำถามที่ใช้ในการระบุคำถามแต่ละข้อ
@@ -22,8 +22,8 @@
 
 | QuestionID | QuestionName               | QuestionType | QuestionDataType | DisplayOrder |
 |------------|----------------------------|--------------|------------------|--------------|
-| 1          | ปัญหาที่พบ  | Text         | String           | 1            |
-| 2          | ช่องระบาย A ข้าวดีปนหรือไม่    | Dropdown     | Integer          | 2            |
+| Q0001          | ปัญหาที่พบ  | Text         | String           | 1            |
+| Q0002          | ช่องระบาย A ข้าวดีปนหรือไม่    | Dropdown     | Integer          | 2            |
 
 ### `QuestionOptions`
 - **OptionID**: (Primary Key) รหัสตัวเลือกที่ใช้ในการระบุแต่ละตัวเลือก
@@ -36,8 +36,8 @@
 
 | OptionID | QuestionID | OptionName   | OptionValue | DisplayOrder |
 |----------|------------|--------------|-------------|--------------|
-| 1        | 2          | ปน     | 1           | 1            |
-| 2        | 2          | ไม่ปน     | 2           | 2            |
+|O0001        | Q0002          | ปน     | 1           | 1            |
+| O0002        | Q0002          | ไม่ปน     | 2           | 2            |
 
 ### `QuestionType`
 - **TypeID**: (Primary Key) รหัสประเภทคำถามที่ใช้ในการระบุประเภทคำถาม
@@ -48,8 +48,8 @@
 
 | TypeID | TypeName  | Description        |
 |--------|-----------|--------------------|
-| 1      | DROPDOWN  | Single selection   |
-| 2      | TEXT_INPUT      | Free text input    |
+| T0001      | DROPDOWN  | Single selection   |
+| T0002      | TEXT_INPUT      | Free text input    |
 
 ### `ValidationRules`
 - **RuleID**: (Primary Key) รหัสกฎที่ใช้ในการระบุแต่ละกฎ
@@ -61,8 +61,8 @@
 
 | RuleID | QuestionID | RuleName  | RuleValue |
 |--------|------------|-----------|-----------|
-| 1      | 1          | Required  | Yes       |
-| 2      | 2          | MaxLength | 100       |
+| R0001      | Q0001          | Required  | Yes       |
+| R0002      | Q0002          | MaxLength | 100       |
 
 ### `MatchQuestion`
 - **MQuestionID**: (Primary Key) รหัสการจับคู่คำถามกับเครื่องจักร
@@ -74,8 +74,8 @@
 
 | MQuestionID | MachineID | QuestionID | FormID |
 |-------------|-----------|------------|--------|
-| 1           | 1         | 1          | 1      |
-| 2           | 1         | 2          | 1      |
+| MQ0001           | M0001         | Q0001          | F0001      |
+| MQ0002           | M0001         | Q0002          | F0001      |
 
 ### `Form`
 - **FormID**: (Primary Key) รหัสฟอร์มที่ใช้ในการระบุฟอร์มแต่ละชุด
@@ -85,8 +85,8 @@
 
 | FormID | FormName      |
 |--------|---------------|
-| 1      | Check Machine |
-| 2      | Maintenance   |
+| F0001      | Check Machine |
+| F0002      | Maintenance   |
 
 ### `ExpectedResult`
 - **ExpectedResultID**: (Primary Key) รหัสผลลัพธ์ที่คาดหวัง
@@ -99,8 +99,8 @@
 
 | ExpectedResultID | MachineID | QuestionID | ExpectedResult | CreateDate |
 |------------------|-----------|------------|----------------|------------|
-| 1                | 1         | 1          | เจอจระเข้ในเครื่อง      | 2024-08-01 |
-| 2                | 1         | 2          | ปน      | 2024-08-01 |
+| ER0001                | M0001         | Q0001          | เจอจระเข้ในเครื่อง      | 2024-08-01 |
+| ER0002                | M0001         | Q0002          | ปน      | 2024-08-01 |
 
 ---
 
