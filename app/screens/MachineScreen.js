@@ -8,23 +8,79 @@ import validator from "validator";
 
 const MachineScreen = () => {
   const [list, setList] = useState([]);
-  const [machineName, setMachineName] = useState("");
-  const [displayOrder, setDisplayOrder] = useState("");
-  const [error, setError] = useState({ machineName: "", displayOrder: "" });
-  const [show, setShow] = useState(false);
+  const [formState, setFormState] = useState({
+    machineName: "",
+    displayOrder: "",
+  });
+  const [error, setError] = useState({
+    machineName: "",
+    displayOrder: "",
+  });
 
-  const getData = async () => {
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        const response = await axios.post("GetMachines");
+        setList(response.data || []);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    getData();
+  }, []);
+
+  const handleInputChange = (fieldName, value) => {
+    let errorMessage = "";
+
+    if (fieldName === "machineName") {
+      if (validator.isEmpty(value.trim())) {
+        errorMessage = "The Machine Name field is required.";
+      }
+    } else if (fieldName === "displayOrder") {
+      if (!validator.isNumeric(value)) {
+        errorMessage = "The Display Order field is Numeric.";
+      }
+    }
+
+    setError((prevError) => ({
+      ...prevError,
+      [fieldName]: errorMessage,
+    }));
+
+    setFormState((prevState) => ({
+      ...prevState,
+      [fieldName]: value,
+    }));
+  };
+
+  const showCreateButton = () => {
+    return (
+      formState.machineName.trim() !== "" &&
+      formState.displayOrder.trim() !== "" &&
+      error.machineName === "" &&
+      error.displayOrder === ""
+    );
+  };
+
+  const insertData = async () => {
+    const data = {
+      MachineName: formState.machineName,
+      DisplayOrder: formState.displayOrder,
+    };
+
     try {
+      await axios.post("InsertMachine", data, {
+        headers: { "Content-Type": "application/json" },
+      });
+      setFormState({ machineName: "", displayOrder: "" });
+      setError({ machineName: "", displayOrder: "" });
       const response = await axios.post("GetMachines");
       setList(response.data || []);
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error("Error inserting data:", error);
     }
   };
-
-  useEffect(() => {
-    getData();
-  }, []);
 
   const state = {
     tableHead: ["Machine Name", "Display Order", "Edit", "Delete"],
@@ -34,62 +90,6 @@ const MachineScreen = () => {
       machine.MachineID,
       machine.MachineID,
     ]),
-  };
-
-  const handleMachineNameChange = (text) => {
-    let errorMessage = "";
-
-    if (validator.isEmpty(text.trim())) {
-      errorMessage = "The Machine Name field is required.";
-    }
-
-    setError({ ...error, machineName: errorMessage });
-    setMachineName(text);
-
-    if (!errorMessage && !error.displayOrder) {
-      setShow(true);
-    } else {
-      setShow(false);
-    }
-  };
-
-  const handleDisplayOrderChange = (text) => {
-    let errorMessage = "";
-
-    if (!validator.isNumeric(text)) {
-      errorMessage = "The Display Order field is Numeric.";
-    }
-
-    setError({ ...error, displayOrder: errorMessage });
-    setDisplayOrder(text);
-
-    if (!errorMessage && !error.machineName) {
-      setShow(true);
-    } else {
-      setShow(false);
-    }
-  };
-
-  const insertData = async () => {
-    const data = {
-      MachineName: machineName,
-      DisplayOrder: displayOrder,
-    };
-
-    console.log(data);
-
-    try {
-      await axios.post("InsertMachine", data, {
-        headers: { "Content-Type": "application/json" },
-      });
-      getData(); 
-      setMachineName(""); 
-      setDisplayOrder("");
-      setError({ machineName: "", displayOrder: "" });
-      setShow(false);
-    } catch (error) {
-      console.error("Error inserting data:", error);
-    }
   };
 
   return (
@@ -103,8 +103,8 @@ const MachineScreen = () => {
             placeholder="Enter Machine Name"
             label="Machine Name"
             disabledInputStyle={styles.containerInput}
-            onChangeText={handleMachineNameChange}
-            value={machineName}
+            onChangeText={(text) => handleInputChange("machineName", text)}
+            value={formState.machineName}
           />
           {error.machineName ? (
             <Text style={styles.errorText}>{error.machineName}</Text>
@@ -114,8 +114,8 @@ const MachineScreen = () => {
             placeholder="Enter Display Order"
             label="Display Order"
             disabledInputStyle={styles.containerInput}
-            onChangeText={handleDisplayOrderChange}
-            value={displayOrder}
+            onChangeText={(text) => handleInputChange("displayOrder", text)}
+            value={formState.displayOrder}
           />
           {error.displayOrder ? (
             <Text style={styles.errorText}>{error.displayOrder}</Text>
@@ -125,9 +125,7 @@ const MachineScreen = () => {
             title="Create"
             type="outline"
             containerStyle={styles.containerButton}
-            disabled={
-              !show || error.machineName !== "" || error.displayOrder !== ""
-            }
+            disabled={!showCreateButton()}
             onPress={insertData}
           />
         </Card>
@@ -146,8 +144,6 @@ const MachineScreen = () => {
   );
 };
 
-export default MachineScreen;
-
 const styles = StyleSheet.create({
   containerButton: {
     width: 200,
@@ -164,3 +160,5 @@ const styles = StyleSheet.create({
     color: colors.error,
   },
 });
+
+export default MachineScreen;
