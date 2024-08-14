@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  FlatList,
-  StyleSheet,
-  TouchableOpacity,
-} from "react-native";
+import "./utils/gesture-handler";
+import { StyleSheet } from "react-native";
+import { colors, spacing } from "../theme/index";
 import axios from "../config/axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { createDrawerNavigator } from "@react-navigation/drawer";
+import DetailMachine from "./screens/DetailMachineScreen"; 
+
+const Drawer = createDrawerNavigator();
 
 const fetchData = async () => {
   try {
@@ -21,19 +20,11 @@ const fetchData = async () => {
 
 const Index = () => {
   const [list, setList] = useState([]);
-  const [themes, setThemes] = useState({});
 
   useEffect(() => {
     const getData = async () => {
       const data = await fetchData();
       setList(data || []);
-
-      try {
-        const storedStyles = await AsyncStorage.getItem("themeSettings");
-        if (storedStyles) setThemes(JSON.parse(storedStyles));
-      } catch (error) {
-        console.error("Error fetching styles from AsyncStorage:", error);
-      }
     };
 
     getData();
@@ -41,59 +32,41 @@ const Index = () => {
 
   const styles = StyleSheet.create({
     container: {
-      backgroundColor: themes.colors ? themes.colors.background : "#fff",
+      backgroundColor: colors.background,
       flex: 1,
-      padding: themes.spacing ? themes.spacing.medium : 16,
+      padding: spacing.md,
     },
     textHeader: {
-      fontSize: themes.fontSizes ? themes.fontSizes.extraLarge : 24,
+      fontSize: 24,
       alignSelf: "center",
-      margin: themes.spacing ? themes.spacing.small : 8,
+      margin: spacing.xs,
     },
     textContent: {
-      fontSize: themes.fontSizes ? themes.fontSizes.medium : 16,
-      margin: themes.spacing ? themes.spacing.small : 8,
-      marginTop: themes.spacing ? themes.spacing.large : 20,
-      color: themes.colors ? themes.colors.text : "#000",
+      fontSize: 16,
+      margin: spacing.xs,
+      marginTop: spacing.xl,
+      color: colors.text,
     },
     buttonTouche: {
       width: "30%",
-      margin: themes.spacing ? themes.spacing.small : 8,
+      margin: spacing.xs,
       height: 35,
       borderRadius: 10,
       elevation: 3,
-      backgroundColor: themes.colors ? themes.colors.dark : "#000",
-
-      textInTouche: {
-        fontSize: themes.fontSizes ? themes.fontSizes.medium : 16,
-        color: themes.colors ? themes.colors.light : "#fff",
-        alignSelf: "center",
-        padding: themes.spacing ? themes.spacing.small : 8,
-      },
+      backgroundColor: colors.dark,
     },
-    
+    textInTouche: {
+      fontSize: 16,
+      color: colors.light,
+      alignSelf: "center",
+      padding: spacing.xs,
+    },
   });
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.textHeader}>KFM ตารางตรวจเช็คเครื่องจักร </Text>
-      <FlatList
-        data={list}
-        keyExtractor={(item) => item.MachineID.toString()}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.buttonTouche}
-            onPress={() =>
-              navigation.navigate("DetailMachine", {
-                machineId: item.MachineID,
-              })
-            }
-          >
-            <Text style={styles.buttonTouche.textInTouche}>{item.MachineName}</Text>
-          </TouchableOpacity>
-        )}
-      />
-    </View>
+    <Drawer.Navigator>
+      <Drawer.Screen name="DetailMachine" component={DetailMachine} />
+    </Drawer.Navigator>
   );
 };
 
