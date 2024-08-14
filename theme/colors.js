@@ -14,4 +14,6 @@ export const colors = {
   text: palette.dark,
 
   background: palette.background,
+
+  error: palette.error
 };

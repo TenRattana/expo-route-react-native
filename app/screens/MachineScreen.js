@@ -1,23 +1,28 @@
-import { StyleSheet, View, Text } from "react-native";
+import { StyleSheet, SafeAreaView, ScrollView, Text } from "react-native";
 import React, { useState, useEffect } from "react";
 import axios from "../../config/axios";
-import { Button, Card, Input, Icon } from "@rneui/themed";
+import { Button, Card, Input } from "@rneui/themed";
 import { colors, spacing } from "../../theme";
-import { Table, TableWrapper, Row, Rows } from "react-native-table-component";
+import { CustomTable } from "../components/index";
+import validator from "validator";
 
 const MachineScreen = () => {
   const [list, setList] = useState([]);
+  const [machineName, setMachineName] = useState("");
+  const [displayOrder, setDisplayOrder] = useState("");
+  const [error, setError] = useState({ machineName: "", displayOrder: "" });
+  const [show, setShow] = useState(false);
+
+  const getData = async () => {
+    try {
+      const response = await axios.post("GetMachines");
+      setList(response.data || []);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
 
   useEffect(() => {
-    const getData = async () => {
-      try {
-        const response = await axios.post("GetMachines");
-        setList(response.data || []);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
     getData();
   }, []);
 
@@ -31,67 +36,113 @@ const MachineScreen = () => {
     ]),
   };
 
-  const renderHeader = (header, index) => {
-    if (index === 2) {
-      return (
-        <View style={styles.headerCell}>
-          <Icon name="create-outline" type="ionicon" size={20} />
-          <Text style={styles.text}>{header}</Text>
-        </View>
-      );
-    } else if (index === 3) {
-      return (
-        <View style={styles.headerCell}>
-          <Icon name="trash-outline" type="ionicon" size={20} />
-          <Text style={styles.text}>{header}</Text>
-        </View>
-      );
+  const handleMachineNameChange = (text) => {
+    let errorMessage = "";
+
+    if (validator.isEmpty(text.trim())) {
+      errorMessage = "The Machine Name field is required.";
     }
-    return (
-      <View style={styles.headerCell}>
-        <Text style={styles.text}>{header}</Text>
-      </View>
-    );
+
+    setError({ ...error, machineName: errorMessage });
+    setMachineName(text);
+
+    if (!errorMessage && !error.displayOrder) {
+      setShow(true);
+    } else {
+      setShow(false);
+    }
+  };
+
+  const handleDisplayOrderChange = (text) => {
+    let errorMessage = "";
+
+    if (!validator.isNumeric(text)) {
+      errorMessage = "The Display Order field is Numeric.";
+    }
+
+    setError({ ...error, displayOrder: errorMessage });
+    setDisplayOrder(text);
+
+    if (!errorMessage && !error.machineName) {
+      setShow(true);
+    } else {
+      setShow(false);
+    }
+  };
+
+  const insertData = async () => {
+    const data = {
+      MachineName: machineName,
+      DisplayOrder: displayOrder,
+    };
+
+    console.log(data);
+
+    try {
+      await axios.post("InsertMachine", data, {
+        headers: { "Content-Type": "application/json" },
+      });
+      getData(); 
+      setMachineName(""); 
+      setDisplayOrder("");
+      setError({ machineName: "", displayOrder: "" });
+      setShow(false);
+    } catch (error) {
+      console.error("Error inserting data:", error);
+    }
   };
 
   return (
-    <View>
-      <Card>
-        <Card.Title>Create Machine</Card.Title>
-        <Card.Divider />
+    <SafeAreaView style={styles.container}>
+      <ScrollView style={styles.scrollView}>
+        <Card>
+          <Card.Title>Create Machine</Card.Title>
+          <Card.Divider />
 
-        <Input
-          placeholder="Enter Machine Name"
-          label="Machine Name"
-          disabledInputStyle={styles.containerInput}
-        />
-        <Button
-          title="Create"
-          type="outline"
-          containerStyle={styles.containerButton}
-        />
-      </Card>
-
-      <Card>
-        <Card.Title>List Machine</Card.Title>
-        <Table borderStyle={{ borderWidth: 1 }} style={styles.containerTable}>
-          <Row
-            data={state.tableHead.map((header, index) =>
-              renderHeader(header, index)
-            )}
-            style={styles.head}
-            textStyle={styles.text}
+          <Input
+            placeholder="Enter Machine Name"
+            label="Machine Name"
+            disabledInputStyle={styles.containerInput}
+            onChangeText={handleMachineNameChange}
+            value={machineName}
           />
-          <TableWrapper style={styles.wrapper}>
-            <Rows
-              data={state.tableData}
-              style={styles.row}
-              textStyle={styles.text}
-            />
-          </TableWrapper>
-        </Table>
-      </Card>
-    </View>
+          {error.machineName ? (
+            <Text style={styles.errorText}>{error.machineName}</Text>
+          ) : null}
+
+          <Input
+            placeholder="Enter Display Order"
+            label="Display Order"
+            disabledInputStyle={styles.containerInput}
+            onChangeText={handleDisplayOrderChange}
+            value={displayOrder}
+          />
+          {error.displayOrder ? (
+            <Text style={styles.errorText}>{error.displayOrder}</Text>
+          ) : null}
+
+          <Button
+            title="Create"
+            type="outline"
+            containerStyle={styles.containerButton}
+            disabled={
+              !show || error.machineName !== "" || error.displayOrder !== ""
+            }
+            onPress={insertData}
+          />
+        </Card>
+
+        <Card>
+          <Card.Title>List Machine</Card.Title>
+          <CustomTable
+            Tabledata={state.tableData}
+            Tablehead={state.tableHead}
+            editIndex={2}
+            delIndex={3}
+          />
+        </Card>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
@@ -107,26 +158,9 @@ const styles = StyleSheet.create({
   containerInput: {
     backgroundColor: colors.dark,
   },
-  containerTable: {
-    width: "90%",
-    alignSelf: "center",
-    margin: spacing.sm,
-  },
-  head: {
-    height: 40,
-    backgroundColor: colors.secondary,
-  },
-  text: {
-    margin: spacing.sm,
-  },
-  row: {
-    flexDirection: "row",
-    backgroundColor: colors.secondary2,
-  },
-  headerCell: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingRight: spacing.sm,
+  errorText: {
+    marginTop: spacing.xxxs,
+    marginLeft: spacing.md,
+    color: colors.error,
   },
 });
