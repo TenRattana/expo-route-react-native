@@ -59,8 +59,8 @@ export default function HomeScreen() {
   });
 
   return (
-    <View>
-      <Text>HomeScreen</Text>
+    <View style={styles.container}>
+      <Text style={styles.textHeader}>KFM Form</Text>
     </View>
   );
 }
