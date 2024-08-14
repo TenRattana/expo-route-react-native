@@ -1,14 +1,14 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 
-const DetailMachineScreen = () => {
+const MachineScreen = () => {
   return (
     <View>
-      <Text>DetailMachineScreen</Text>
+      <Text>MachineScreen</Text>
     </View>
   )
 }
 
-export default DetailMachineScreen
+export default MachineScreen
 
 const styles = StyleSheet.create({})
