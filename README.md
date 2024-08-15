@@ -41,6 +41,7 @@ CREATE TABLE MatchQuestionMachine (
     QuestionID VARCHAR(10),
     TypeID VARCHAR(10),
     DataTypeID VARCHAR(10),
+    IsActive BIT,
     DisplayOrder INT,
     FOREIGN KEY (MachineID) REFERENCES Machine(MachineID),
     FOREIGN KEY (QuestionID) REFERENCES Questions(QuestionID),
@@ -126,10 +127,10 @@ VALUES
 ('Q0002', 'Is channel A contaminated with good grain?');
 
 -- Insert data into MatchQuestionMachine
-INSERT INTO MatchQuestionMachine (MOptionID, MachineID, QuestionID, TypeID, DataTypeID, DisplayOrder)
+INSERT INTO MatchQuestionMachine (MOptionID, MachineID, QuestionID, TypeID, DataTypeID, IsActive, DisplayOrder)
 VALUES
-('MQM0001', 'M0001', 'Q0001', 'T0002', 'DT0001', 1),
-('MQM0002', 'M0001', 'Q0002', 'T0001', 'DT0002', 2);
+('MQM0001', 'M0001', 'Q0001', 'T0002', 'DT0001', 0, 1),
+('MQM0002', 'M0001', 'Q0002', 'T0001', 'DT0002', 0, 2);
 
 -- Insert data into QuestionOptions
 INSERT INTO QuestionOptions (OptionID, OptionName)
