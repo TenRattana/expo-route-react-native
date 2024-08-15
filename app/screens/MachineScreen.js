@@ -11,10 +11,12 @@ const MachineScreen = () => {
   const [formState, setFormState] = useState({
     machineName: "",
     displayOrder: "",
+    description: "",
   });
   const [error, setError] = useState({
     machineName: "",
     displayOrder: "",
+    description: "",
   });
 
   useEffect(() => {
@@ -38,7 +40,7 @@ const MachineScreen = () => {
         errorMessage = "The Machine Name field is required.";
       }
     } else if (fieldName === "displayOrder") {
-      if (!validator.isNumeric(value)) {
+      if (!validator.isNumeric(value.trim())) {
         errorMessage = "The Display Order field is Numeric.";
       }
     }
@@ -58,8 +60,10 @@ const MachineScreen = () => {
     return (
       formState.machineName.trim() !== "" &&
       formState.displayOrder.trim() !== "" &&
+      formState.description.trim() !== "" &&
       error.machineName === "" &&
-      error.displayOrder === ""
+      error.displayOrder === "" &&
+      error.description === ""
     );
   };
 
@@ -67,6 +71,7 @@ const MachineScreen = () => {
     const data = {
       MachineName: formState.machineName,
       DisplayOrder: formState.displayOrder,
+      Description: formState.description,
     };
 
     try {
@@ -83,9 +88,16 @@ const MachineScreen = () => {
   };
 
   const state = {
-    tableHead: ["Machine Name", "Display Order", "Edit", "Delete"],
+    tableHead: [
+      "Machine Name",
+      "Description",
+      "Display Order",
+      "Edit",
+      "Delete",
+    ],
     tableData: list.map((machine) => [
       machine.MachineName,
+      machine.Description,
       machine.DisplayOrder,
       machine.MachineID,
       machine.MachineID,
@@ -121,6 +133,17 @@ const MachineScreen = () => {
             <Text style={styles.errorText}>{error.displayOrder}</Text>
           ) : null}
 
+          <Input
+            placeholder="Enter Description"
+            label="Description"
+            disabledInputStyle={styles.containerInput}
+            onChangeText={(text) => handleInputChange("description", text)}
+            value={formState.description}
+          />
+          {error.displayOrder ? (
+            <Text style={styles.errorText}>{error.description}</Text>
+          ) : null}
+
           <Button
             title="Create"
             type="outline"
@@ -135,8 +158,8 @@ const MachineScreen = () => {
           <CustomTable
             Tabledata={state.tableData}
             Tablehead={state.tableHead}
-            editIndex={2}
-            delIndex={3}
+            editIndex={3}
+            delIndex={4}
           />
         </Card>
       </ScrollView>
@@ -155,8 +178,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.dark,
   },
   errorText: {
-    marginTop: spacing.xxxs,
-    marginLeft: spacing.md,
+    top:-12,
+    marginLeft: spacing.sm,
     color: colors.error,
   },
 });
