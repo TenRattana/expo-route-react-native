@@ -8,6 +8,7 @@ import Machine from "./screens/MachineScreen";
 import HomeScreen from "./screens/HomeScreen";
 import QuestionScreen from "./screens/QuestionScreen";
 import QuestionDetailScreen from "./screens/QuestionDetailScreen";
+import QuestionValidationScreen from "./screens/QuestionValidationScreen";
 
 const Drawer = createDrawerNavigator();
 
@@ -18,6 +19,7 @@ const Index = () => {
       <Drawer.Screen name="Machine" component={Machine} />
       <Drawer.Screen name="Question" component={QuestionScreen} />
       <Drawer.Screen name="Detail Question" component={QuestionDetailScreen} />
+      <Drawer.Screen name="Validation" component={QuestionValidationScreen} />
     </Drawer.Navigator>
   );
 };
