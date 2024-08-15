@@ -6,35 +6,34 @@ import { colors, spacing } from "../../theme";
 import { CustomTable } from "../components/index";
 import validator from "validator";
 
-const QuestionForm = () => {
+const QuestionOptionScreen = () => {
   const [list, setList] = useState([]);
   const [formState, setFormState] = useState({
-    questionName: "",
+    questionOption: "",
   });
-
   const [error, setError] = useState({
-    questionName: "",
+    questionOption: "",
   });
 
   useEffect(() => {
-    const getQuestion = async () => {
+    const getQuestionOptions = async () => {
       try {
-        const response = await axios.post("GetQuestions");
+        const response = await axios.post("GetQuestionOptions");
         setList(response.data || []);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
 
-    getQuestion();
+    getQuestionOptions();
   }, []);
 
   const handleInputChange = (fieldName, value) => {
     let errorMessage = "";
 
-    if (fieldName === "questionName") {
+    if (fieldName === "questionOption") {
       if (validator.isEmpty(value.trim())) {
-        errorMessage = "The Question Name field is required.";
+        errorMessage = "The Question Option Name field is required.";
       }
     }
 
@@ -50,24 +49,21 @@ const QuestionForm = () => {
   };
 
   const showCreateButton = () => {
-    return (
-      formState.questionName.trim() !== "" &&
-      error.questionName === "" 
-    );
+    return formState.questionOption.trim() !== "" && error.questionOption === "";
   };
 
   const insertData = async () => {
     const data = {
-      QuestionName: formState.questionName
+        OptionName: formState.questionOption,
     };
 
     try {
-      await axios.post("InsertQuestion", data, {
+      await axios.post("InsertQuestionOption", data, {
         headers: { "Content-Type": "application/json" },
       });
-      setFormState({ questionName: ""});
-      setError({ questionName: "" });
-      const response = await axios.post("GetQuestions");
+      setFormState({ questionOption: "" });
+      setError({ questionOption: "" });
+      const response = await axios.post("GetQuestionOptions");
       setList(response.data || []);
     } catch (error) {
       console.error("Error inserting data:", error);
@@ -75,15 +71,11 @@ const QuestionForm = () => {
   };
 
   const state = {
-    tableHead: [
-      "Question Name",
-      "Edit",
-      "Delete",
-    ],
+    tableHead: ["Question Option Name", "Edit", "Delete"],
     tableData: list.map((item) => [
-      item.QuestionName,
-      item.QuestionID,
-      item.QuestionID,
+        item.OptionName,
+        item.OptionID,
+        item.OptionID,
     ]),
   };
 
@@ -91,17 +83,18 @@ const QuestionForm = () => {
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView}>
         <Card>
-          <Card.Title>Create Question</Card.Title>
+          <Card.Title>Create Option</Card.Title>
           <Card.Divider />
+
           <Input
-            placeholder="Enter Question Name"
-            label="Question Name"
+            placeholder="Enter Question Option Name"
+            label="Question Option Name"
             disabledInputStyle={styles.containerInput}
-            value={formState.questionName}
-            onChangeText={(text) => handleInputChange("questionName", text)}
+            onChangeText={(text) => handleInputChange("questionOption", text)}
+            value={formState.questionOption}
           />
-          {error.questionName ? (
-            <Text style={styles.errorText}>{error.questionName}</Text>
+          {error.questionOption ? (
+            <Text style={styles.errorText}>{error.questionOption}</Text>
           ) : null}
 
           <Button
@@ -114,7 +107,7 @@ const QuestionForm = () => {
         </Card>
 
         <Card>
-          <Card.Title>List Question</Card.Title>
+          <Card.Title>List Option</Card.Title>
           <CustomTable
             Tabledata={state.tableData}
             Tablehead={state.tableHead}
@@ -144,4 +137,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default QuestionForm;
+export default QuestionOptionScreen;

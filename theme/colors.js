@@ -3,6 +3,7 @@ const palette = {
   secondary: "#03dac6",
   secondary2: "#02dac6",
   background: "#f6f6f6",
+  gray90: "#909090",
   light: "#ffffff",
   error: "#b00020",
   dark: "#000000",

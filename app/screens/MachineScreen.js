@@ -20,7 +20,7 @@ const MachineScreen = () => {
   });
 
   useEffect(() => {
-    const getData = async () => {
+    const getMachine = async () => {
       try {
         const response = await axios.post("GetMachines");
         setList(response.data || []);
@@ -29,7 +29,7 @@ const MachineScreen = () => {
       }
     };
 
-    getData();
+    getMachine();
   }, []);
 
   const handleInputChange = (fieldName, value) => {
@@ -95,12 +95,12 @@ const MachineScreen = () => {
       "Edit",
       "Delete",
     ],
-    tableData: list.map((machine) => [
-      machine.MachineName,
-      machine.Description,
-      machine.DisplayOrder,
-      machine.MachineID,
-      machine.MachineID,
+    tableData: list.map((item) => [
+      item.MachineName,
+      item.Description,
+      item.DisplayOrder,
+      item.MachineID,
+      item.MachineID,
     ]),
   };
 

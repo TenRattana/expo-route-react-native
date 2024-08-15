@@ -1,2 +1,2 @@
 export * from "./CustomTable";
-export * from "./CustomDropDown";
+export * from "./DropdownComponent";
