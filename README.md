@@ -1,14 +1,13 @@
-# Database Schema Documentation
+# Database Schema and Sample Data
 
-This document describes the database schema for the project, including table definitions, example data, and a dbdiagram schema.
+This README provides the SQL schema for creating tables and inserting sample data into the database. The schema is designed to support dynamic forms and validation in a database environment.
 
-## Tables
+## Schema Definition
 
-### `Machine`
-
-Stores information about machines.
+### Create Tables
 
 ```sql
+-- Create Table Machine
 CREATE TABLE Machine (
     MachineID VARCHAR(10) PRIMARY KEY,
     MachineName VARCHAR(255),
@@ -16,61 +15,28 @@ CREATE TABLE Machine (
     DisplayOrder INT
 );
 
--- Sample Data
-INSERT INTO Machine (MachineID, MachineName, Description, DisplayOrder) VALUES
-('M0001', 'SEPARATOR', NULL, 1),
-('M0002', 'MILL A', NULL, 2);
-```
-### `QuestionType`
-
-Stores types of questions.
-```sql
+-- Create Table QuestionType
 CREATE TABLE QuestionType (
     TypeID VARCHAR(10) PRIMARY KEY,
     TypeName VARCHAR(50)
 );
 
--- Sample Data
-INSERT INTO QuestionType (TypeID, TypeName) VALUES
-('T0001', 'DROPDOWN'),
-('T0002', 'TEXT_INPUT');
-```
-
-### `DataType`
-Stores data types for questions.
-```sql
+-- Create Table DataType
 CREATE TABLE DataType (
     DataTypeID VARCHAR(10) PRIMARY KEY,
     DataTypeName VARCHAR(50)
 );
 
--- Sample Data
-INSERT INTO DataType (DataTypeID, DataTypeName) VALUES
-('DT0001', 'String'),
-('DT0002', 'Integer');
-```
-### `Questions`
-Stores questions.
-```sql
+-- Create Table Questions
 CREATE TABLE Questions (
     QuestionID VARCHAR(10) PRIMARY KEY,
-    QuestionName VARCHAR(255),
-    TypeID VARCHAR(10),
-    DataTypeID VARCHAR(10),
-    FOREIGN KEY (TypeID) REFERENCES QuestionType(TypeID),
-    FOREIGN KEY (DataTypeID) REFERENCES DataType(DataTypeID)
+    QuestionName VARCHAR(255)
 );
 
--- Sample Data
-INSERT INTO Questions (QuestionID, QuestionName, TypeID, DataTypeID) VALUES
-('Q0001', 'ปัญหาที่พบ', 'T0002', 'DT0001'),
-('Q0002', 'ช่องระบาย A ข้าวดีปนหรือไม่', 'T0001', 'DT0002');
-```
-### `MatchQuestionMachine`
-Maps questions to machines.
-```sql
+-- Create Table MatchQuestionMachine
 CREATE TABLE MatchQuestionMachine (
-    MOptionID VARCHAR(10) PRIMARY KEY,
+    ID INT IDENTITY PRIMARY KEY,
+    MOptionID VARCHAR(10),
     MachineID VARCHAR(10),
     QuestionID VARCHAR(10),
     TypeID VARCHAR(10),
@@ -82,29 +48,16 @@ CREATE TABLE MatchQuestionMachine (
     FOREIGN KEY (DataTypeID) REFERENCES DataType(DataTypeID)
 );
 
--- Sample Data
-INSERT INTO MatchQuestionMachine (MOptionID, MachineID, QuestionID, TypeID, DataTypeID, DisplayOrder) VALUES
-('MQ0001', 'M0001', 'Q0001', 'T0002', 'DT0001', 1),
-('MQ0002', 'M0001', 'Q0002', 'T0001', 'DT0002', 2);
-```
-### `QuestionOptions`
-Stores options for questions.
-```sql
+-- Create Table QuestionOptions
 CREATE TABLE QuestionOptions (
     OptionID VARCHAR(10) PRIMARY KEY,
     OptionName VARCHAR(255)
 );
 
--- Sample Data
-INSERT INTO QuestionOptions (OptionID, OptionName) VALUES
-('O0001', 'ปน'),
-('O0002', 'ไม่ปน');
-```
-### `MatchQuestionOptions`
-Maps options to questions.
-```sql
+-- Create Table MatchQuestionOptions
 CREATE TABLE MatchQuestionOptions (
-    MOptionID VARCHAR(10) PRIMARY KEY,
+    ID INT IDENTITY PRIMARY KEY,
+    MOptionID VARCHAR(10),
     QuestionID VARCHAR(10),
     OptionID VARCHAR(10),
     OptionValue INT,
@@ -114,30 +67,17 @@ CREATE TABLE MatchQuestionOptions (
     FOREIGN KEY (OptionID) REFERENCES QuestionOptions(OptionID)
 );
 
--- Sample Data
-INSERT INTO MatchQuestionOptions (MOptionID, QuestionID, OptionID, OptionValue, Description, DisplayOrder) VALUES
-('MOQ0001', 'Q0002', 'O0001', 1, NULL, 1),
-('MOQ0002', 'Q0002', 'O0002', 2, NULL, 2);
-```
-### `ValidationRules`
-Stores validation rules.
-```sql
+-- Create Table ValidationRules
 CREATE TABLE ValidationRules (
     RuleID VARCHAR(10) PRIMARY KEY,
     RuleName VARCHAR(50),
     RuleValue VARCHAR(50)
 );
 
--- Sample Data
-INSERT INTO ValidationRules (RuleID, RuleName, RuleValue) VALUES
-('R0001', 'Required', 'Yes'),
-('R0002', 'MaxLength', '100');
-```
-### `MatchValidationRules`
-Maps validation rules to questions.
-```sql
+-- Create Table MatchValidationRules
 CREATE TABLE MatchValidationRules (
-    MRuleID VARCHAR(10) PRIMARY KEY,
+    ID INT IDENTITY PRIMARY KEY,
+    MRuleID VARCHAR(10),
     QuestionID VARCHAR(10),
     RuleID VARCHAR(10),
     Description TEXT,
@@ -145,26 +85,79 @@ CREATE TABLE MatchValidationRules (
     FOREIGN KEY (RuleID) REFERENCES ValidationRules(RuleID)
 );
 
--- Sample Data
-INSERT INTO MatchValidationRules (MRuleID, QuestionID, RuleID, Description) VALUES
-('MVR0001', 'Q0001', 'R0001', 'This field is required.'),
-('MVR0002', 'Q0002', 'R0002', 'Maximum length of 100 characters.');
-```
-### `ExpectedResult`
-Stores expected results for questions.
-```sql
+-- Create Table ExpectedResult
 CREATE TABLE ExpectedResult (
-    ExpectedResultID VARCHAR(10) PRIMARY KEY,
-    MOptionID VARCHAR(10),
-    PrivotID VARCHAR(50),
+    ID INT IDENTITY PRIMARY KEY,
+    ExpectedResultID VARCHAR(50),
+    MachineID VARCHAR(10),
+    QuestionID VARCHAR(10),
     ExpectedResult TEXT,
     CreateDate DATE,
-    FOREIGN KEY (MOptionID) REFERENCES MatchQuestionMachine(MOptionID)
+    FOREIGN KEY (MachineID) REFERENCES Machine(MachineID),
+    FOREIGN KEY (QuestionID) REFERENCES Questions(QuestionID)
 );
-
--- Sample Data
-INSERT INTO ExpectedResult (ExpectedResultID, MOptionID, PrivotID, ExpectedResult, CreateDate) VALUES
-('ER0001', 'MQ0001', 'P20240801001', 'เจอจระเข้ในเครื่อง', '2024-08-01'),
-('ER0002', 'MQ0002', 'P20240801001', '1', '2024-08-01');
 ```
-----
+
+### Insert data
+```sql
+-- Insert data into Machine
+INSERT INTO Machine (MachineID, MachineName, Description, DisplayOrder)
+VALUES
+('M0001', 'SEPARATOR', 'Separator machine for material processing', 1),
+('M0002', 'MILL A', 'Milling machine A', 2);
+
+-- Insert data into QuestionType
+INSERT INTO QuestionType (TypeID, TypeName)
+VALUES
+('T0001', 'DROPDOWN'),
+('T0002', 'TEXT_INPUT');
+
+-- Insert data into DataType
+INSERT INTO DataType (DataTypeID, DataTypeName)
+VALUES
+('DT0001', 'String'),
+('DT0002', 'Integer'),
+('DT0003', 'Date');
+
+-- Insert data into Questions
+INSERT INTO Questions (QuestionID, QuestionName)
+VALUES
+('Q0001', 'Problem Found'),
+('Q0002', 'Is channel A contaminated with good grain?');
+
+-- Insert data into MatchQuestionMachine
+INSERT INTO MatchQuestionMachine (MOptionID, MachineID, QuestionID, TypeID, DataTypeID, DisplayOrder)
+VALUES
+('MQM0001', 'M0001', 'Q0001', 'T0002', 'DT0001', 1),
+('MQM0002', 'M0001', 'Q0002', 'T0001', 'DT0002', 2);
+
+-- Insert data into QuestionOptions
+INSERT INTO QuestionOptions (OptionID, OptionName)
+VALUES
+('O0001', 'Contaminated'),
+('O0002', 'Not Contaminated');
+
+-- Insert data into MatchQuestionOptions
+INSERT INTO MatchQuestionOptions (MOptionID, QuestionID, OptionID, OptionValue, Description, DisplayOrder)
+VALUES
+('MQM0001', 'Q0002', 'O0001', 1, 'Grain is contaminated', 1),
+('MQM0001', 'Q0002', 'O0002', 2, 'Grain is not contaminated', 2);
+
+-- Insert data into ValidationRules
+INSERT INTO ValidationRules (RuleID, RuleName, RuleValue)
+VALUES
+('R0001', 'Required', 'Yes'),
+('R0002', 'MaxLength', '255');
+
+-- Insert data into MatchValidationRules
+INSERT INTO MatchValidationRules (MRuleID, QuestionID, RuleID, Description)
+VALUES
+('MVR0001', 'Q0001', 'R0001', 'This question is required'),
+('MVR0002', 'Q0002', 'R0002', 'Maximum length of the response is 255 characters');
+
+-- Insert data into ExpectedResult
+INSERT INTO ExpectedResult (ExpectedResultID, MachineID, QuestionID, ExpectedResult, CreateDate)
+VALUES
+('ER0001', 'M0001', 'Q0001', 'Found contaminated grain', '2024-08-01'),
+('ER0002', 'M0001', 'Q0002', 'Found 1 grain', '2024-08-01');
+```
