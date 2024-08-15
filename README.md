@@ -27,17 +27,28 @@
 
 ### `QuestionOptions`
 - **OptionID**: (Primary Key) รหัสตัวเลือกที่ใช้ในการระบุแต่ละตัวเลือก
-- **QuestionID**: (Foreign Key) รหัสคำถามที่ตัวเลือกนี้เกี่ยวข้อง
 - **OptionName**: ชื่อตัวเลือก
-- **OptionValue**: ค่าของตัวเลือก (มักใช้ในการเก็บค่าตัวเลือกสำหรับ Dropdown)
+
+**ข้อมูลตัวอย่าง:**
+
+| OptionID | OptionName  |
+|----------|------------|
+|O0001        | ปน     | 
+| O0002        |ไม่ปน     | 
+
+### `MatchQuestionOptions`
+- **MOptionID**: (Primary Key) รหัสตัวเลือกที่ใช้ในการระบุแต่ละตัวเลือก
+- **QuestionID**: (Foreign Key) รหัสคำถามที่ตัวเลือกนี้เกี่ยวข้อง
+- **OptionID**: (Foreign Key) รหัสคำถามตัวเลือกที่ใช้ในการระบุแต่ละตัวเลือก
+- **OptionValue**: ค่าของตัวเลือก 
 - **DisplayOrder**: ลำดับการแสดงผลของตัวเลือก
 
 **ข้อมูลตัวอย่าง:**
 
-| OptionID | QuestionID | OptionName   | OptionValue | DisplayOrder |
+| MOptionID | QuestionID | OptionID   | OptionValue | DisplayOrder |
 |----------|------------|--------------|-------------|--------------|
-|O0001        | Q0002          | ปน     | 1           | 1            |
-| O0002        | Q0002          | ไม่ปน     | 2           | 2            |
+|O0001        | Q0002          | O0001     | 1           | 1            |
+| O0002        | Q0002          | O0002     | 2           | 2            |
 
 ### `QuestionType`
 - **TypeID**: (Primary Key) รหัสประเภทคำถามที่ใช้ในการระบุประเภทคำถาม
