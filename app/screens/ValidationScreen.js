@@ -6,22 +6,24 @@ import { colors, spacing } from "../../theme";
 import { CustomTable } from "../components/index";
 import validator from "validator";
 
-const QuestionForm = () => {
-  const [question, setQuestion] = useState([]);
+const ValidationScreen = () => {
+  const [validation, setValidation] = useState([]);
   const [formState, setFormState] = useState({
-    questionName: "",
+    ruleName: "",
+    ruleValue: "",
   });
   const [error, setError] = useState({
-    questionName: "",
+    ruleName: "",
+    ruleValue: "",
   });
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [questionResponse] = await Promise.all([
-          axios.post("GetQuestions"),
+        const [validationResponse] = await Promise.all([
+          axios.post("GetValidationRules"),
         ]);
-        setQuestion(questionResponse.data || []);
+        setValidation(validationResponse.data || []);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -33,8 +35,10 @@ const QuestionForm = () => {
   const handleInputChange = (fieldName, value) => {
     let errorMessage = "";
 
-    if (fieldName === "questionName" && validator.isEmpty(value.trim())) {
-      errorMessage = "The Question Name field is required.";
+    if (fieldName === "ruleName" && validator.isEmpty(value.trim())) {
+      errorMessage = "The Rule Name field is required.";
+    } else if (fieldName === "ruleValue" && validator.isEmpty(value.trim())) {
+      errorMessage = "The Rule Value field is required.";
     }
 
     setError((prevError) => ({
@@ -57,43 +61,56 @@ const QuestionForm = () => {
 
   const insertData = async () => {
     const data = {
-      QuestionName: formState.questionName,
+      RuleName: formState.ruleName,
+      RuleValue: formState.ruleValue,
     };
 
     try {
-      await axios.post("InsertQuestion", data, {
+      await axios.post("InsertQuestionOption", data, {
         headers: { "Content-Type": "application/json" },
       });
-      setFormState({ questionName: "" });
-      setError({ questionName: "" });
-      const response = await axios.post("GetQuestions");
-      setQuestion(response.data || []);
+      setFormState({ ruleName: "", ruleValue: "" });
+      setError({ ruleName: "", ruleValue: "" });
+      const response = await axios.post("GetValidationRules");
+      setValidation(response.data || []);
     } catch (error) {
       console.error("Error inserting data:", error);
     }
   };
 
-  const tableData = question.map((item) => {
-    return [item.QuestionName, item.QuestionID, item.QuestionID];
+  const tableData = validation.map((item) => {
+    return [item.RuleName, item.RuleValue, item.RuleID, item.RuleID];
   });
 
-  const tableHead = ["Question Name", "Edit", "Delete"];
+  const tableHead = ["Rule Name", "Rule Value", "Edit", "Delete"];
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView}>
         <Card>
-          <Card.Title>Create Question</Card.Title>
+          <Card.Title>Create Rule</Card.Title>
           <Card.Divider />
+
           <Input
-            placeholder="Enter Question Name"
-            label="Question Name"
+            placeholder="Enter Rule Name"
+            label="Rule Name"
             disabledInputStyle={styles.containerInput}
-            value={formState.questionName}
-            onChangeText={(text) => handleInputChange("questionName", text)}
+            onChangeText={(text) => handleInputChange("ruleName", text)}
+            value={formState.ruleName}
           />
-          {error.questionName ? (
-            <Text style={styles.errorText}>{error.questionName}</Text>
+          {error.ruleName ? (
+            <Text style={styles.errorText}>{error.ruleName}</Text>
+          ) : null}
+
+          <Input
+            placeholder="Enter Rule Value"
+            label="Rule Value"
+            disabledInputStyle={styles.containerInput}
+            onChangeText={(text) => handleInputChange("ruleValue", text)}
+            value={formState.ruleValue}
+          />
+          {error.ruleValue ? (
+            <Text style={styles.errorText}>{error.ruleValue}</Text>
           ) : null}
 
           <Button
@@ -106,12 +123,12 @@ const QuestionForm = () => {
         </Card>
 
         <Card>
-          <Card.Title>List Question</Card.Title>
+          <Card.Title>List Option</Card.Title>
           <CustomTable
             Tabledata={tableData}
             Tablehead={tableHead}
-            editIndex={1}
-            delIndex={2}
+            editIndex={2}
+            delIndex={3}
           />
         </Card>
       </ScrollView>
@@ -136,4 +153,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default QuestionForm;
+export default ValidationScreen;

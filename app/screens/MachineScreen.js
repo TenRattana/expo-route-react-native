@@ -40,7 +40,7 @@ const MachineScreen = () => {
     fetchData();
   }, []);
 
-  const handleInputChange = (fieldName, value) => {
+  const handleChange = (fieldName, value) => {
     let errorMessage = "";
 
     if (fieldName === "machineName" && validator.isEmpty(value.trim())) {
@@ -68,13 +68,6 @@ const MachineScreen = () => {
       Object.values(formState).every((value) => String(value).trim() !== "") &&
       Object.values(error).every((err) => err === "")
     );
-  };
-
-  const handleDropdownChange = (value, fieldName) => {
-    setFormState((prevState) => ({
-      ...prevState,
-      [fieldName]: value,
-    }));
   };
 
   const insertData = async () => {
@@ -144,7 +137,7 @@ const MachineScreen = () => {
             title="Machine Group"
             label="MGroup"
             data={machineGroup}
-            updatedropdown={handleDropdownChange}
+            updatedropdown={handleChange}
           />
           {error.machineGroupId ? (
             <Text style={styles.errorText}>{error.machineGroupId}</Text>
@@ -154,7 +147,7 @@ const MachineScreen = () => {
             placeholder="Enter Machine Name"
             label="Machine Name"
             disabledInputStyle={styles.containerInput}
-            onChangeText={(text) => handleInputChange("machineName", text)}
+            onChangeText={(text) => handleChange("machineName", text)}
             value={formState.machineName}
           />
           {error.machineName ? (
@@ -165,7 +158,7 @@ const MachineScreen = () => {
             placeholder="Enter Display Order"
             label="Display Order"
             disabledInputStyle={styles.containerInput}
-            onChangeText={(text) => handleInputChange("displayOrder", text)}
+            onChangeText={(text) => handleChange("displayOrder", text)}
             value={formState.displayOrder}
           />
           {error.displayOrder ? (
@@ -176,7 +169,7 @@ const MachineScreen = () => {
             placeholder="Enter Description"
             label="Description"
             disabledInputStyle={styles.containerInput}
-            onChangeText={(text) => handleInputChange("description", text)}
+            onChangeText={(text) => handleChange("description", text)}
             value={formState.description}
           />
           {error.description ? (

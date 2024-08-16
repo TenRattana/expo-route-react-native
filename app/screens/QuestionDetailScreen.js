@@ -4,76 +4,56 @@ import axios from "../../config/axios";
 import { Button, Card, Input } from "@rneui/themed";
 import { colors, spacing } from "../../theme";
 import { CustomTable } from "../components/index";
-import DropdownComponent from "../components/CustomDropdown"
+import DropdownComponent from "../components/CustomDropdown";
 import validator from "validator";
 
 const QuestionDetailScreen = () => {
-  const [list, setList] = useState([]);
+  const [detailQuestion, setDetailQuestion] = useState([]);
   const [question, setQuestion] = useState([]);
   const [option, setOption] = useState([]);
   const [formState, setFormState] = useState({
-    qusetionId: "",
-    optionID: "",
-    optionValue: "",
+    questionId: "",
+    optionId: "",
     displayOrder: "",
     description: "",
   });
   const [error, setError] = useState({
-    qusetionId: "",
-    optionID: "",
-    optionValue: "",
+    questionId: "",
+    optionId: "",
     displayOrder: "",
     description: "",
   });
 
   useEffect(() => {
-    const getQuestions = async () => {
+    const fetchData = async () => {
       try {
-        const response = await axios.post("GetQuestions");
-        setQuestion(response.data || []);
+        const [questionResponse, optionResponse, questionDetailResponse] =
+          await Promise.all([
+            axios.post("GetQuestions"),
+            axios.post("GetQuestionOptions"),
+            axios.post("GetQuestionDetails"),
+          ]);
+        setQuestion(questionResponse.data || []);
+        setOption(optionResponse.data || []);
+        setDetailQuestion(questionDetailResponse.data || []);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
 
-    const getQuestionOptions = async () => {
-      try {
-        const response = await axios.post("GetQuestionOptions");
-        setOption(response.data || []);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    const getQuestionDetail = async () => {
-      try {
-        const response = await axios.post("GetQuestionDetails");
-        setList(response.data || []);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    getQuestions();
-    getQuestionOptions();
-    getQuestionDetail();
+    fetchData();
   }, []);
 
-  const handleInputChange = (fieldName, value) => {
+  const handleChange = (fieldName, value) => {
     let errorMessage = "";
 
-    if (fieldName === "qusetionId") {
-      if (validator.isEmpty(value.trim())) {
-        errorMessage = "The Question field is required.";
-      }
-    } else if (fieldName === "optionID") {
-      if (!validator.isNumeric(value.trim())) {
-        errorMessage = "The Option field is Numeric.";
-      }
-    } else if (fieldName === "optionValue") {
-      if (!validator.isNumeric(value.trim())) {
-        errorMessage = "The Option Value field is Numeric.";
-      }
+    if (fieldName === "description" && validator.isEmpty(value.trim())) {
+      errorMessage = "The Description field is required.";
+    } else if (
+      fieldName === "displayOrder" &&
+      validator.isEmpty(value.trim())
+    ) {
+      errorMessage = "The Display Order field is required.";
     }
 
     setError((prevError) => ({
@@ -87,26 +67,17 @@ const QuestionDetailScreen = () => {
     }));
   };
 
-  const showCreateButton = () => {
+  const isFormValid = () => {
     return (
-      formState.qusetionId.trim() !== "" &&
-      formState.optionID.trim() !== "" &&
-      formState.optionValue.trim() !== "" &&
-      formState.displayOrder.trim() !== "" &&
-      formState.description.trim() !== "" &&
-      error.qusetionId !== "" &&
-      error.optionID !== "" &&
-      error.optionValue !== "" &&
-      error.displayOrder !== "" &&
-      error.description !== ""
+      Object.values(formState).every((value) => String(value).trim() !== "") &&
+      Object.values(error).every((err) => err === "")
     );
   };
 
   const insertData = async () => {
     const data = {
-      QuestionID: formState.qusetionId,
-      OptionID: formState.optionID,
-      OptionValue: formState.optionValue,
+      QuestionID: formState.questionId,
+      OptionID: formState.optionId,
       DisplayOrder: formState.displayOrder,
       Description: formState.description,
     };
@@ -116,101 +87,109 @@ const QuestionDetailScreen = () => {
         headers: { "Content-Type": "application/json" },
       });
       setFormState({
-        qusetionId: "",
-        optionID: "",
-        optionValue: "",
+        questionId: "",
+        optionId: "",
         displayOrder: "",
         description: "",
       });
       setError({
-        qusetionId: "",
-        optionID: "",
-        optionValue: "",
+        questionId: "",
+        optionId: "",
         displayOrder: "",
         description: "",
       });
       const response = await axios.post("GetQuestionDetails");
-      setList(response.data || []);
+      setDetailQuestion(response.data || []);
     } catch (error) {
       console.error("Error inserting data:", error);
     }
   };
 
-  const state = {
-    tableHead: [
-      "Question",
-      "Option",
-      "Value",
-      "Description",
-      "DisplayOrder",
-      "Edit",
-      "Delete",
-    ],
-    tableData: list.map((item) => [
-      item.QuestionID,
-      item.OptionID,
-      item.OptionValue,
+  const tableData = detailQuestion.map((item) => {
+    const indexQ = question.findIndex(
+      (group) => group.QuestionID === item.QuestionID
+    );
+    const indexO = option.findIndex(
+      (group) => group.OptionID === item.OptionID
+    );
+
+    return [
+      item.MOptionID,
+      indexQ > -1 ? question[indexQ]?.QuestionName || "" : "",
+      indexO > -1 ? option[indexO]?.OptionName || "" : "",
       item.Description,
       item.DisplayOrder,
       item.ID,
       item.ID,
-    ]),
-  };
+    ];
+  });
 
-  
+  const tableHead = [
+    "Match Option ID",
+    "Question Name",
+    "Option Name",
+    "Description",
+    "DisplayOrder",
+    "Edit",
+    "Delete",
+  ];
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView}>
-
         <Card>
           <Card.Title>Create Question Detail</Card.Title>
           <Card.Divider />
 
-          <DropdownComponent  title="Question" data={question}/>
-          {error.questionOption ? (
-            <Text style={styles.errorText}>{error.questionOption}</Text>
-          ) : null}
-          <DropdownComponent  title="Option" data={option}/>
-          {error.questionOption ? (
-            <Text style={styles.errorText}>{error.questionOption}</Text>
-          ) : null}
-          <Input
-            placeholder="Enter Question Option Name"
-            label="Question Option Name"
-            disabledInputStyle={styles.containerInput}
-            onChangeText={(text) => handleInputChange("questionOption", text)}
-            value={formState.questionOption}
+          <DropdownComponent
+            fieldName="questionId"
+            title="Question"
+            label="Question"
+            data={question}
+            updatedropdown={handleChange}
           />
-          {error.questionOption ? (
-            <Text style={styles.errorText}>{error.questionOption}</Text>
+          {error.questionId ? (
+            <Text style={styles.errorText}>{error.questionId}</Text>
           ) : null}
-          <Input
-            placeholder="Enter Question Option Name"
-            label="Question Option Name"
-            disabledInputStyle={styles.containerInput}
-            onChangeText={(text) => handleInputChange("questionOption", text)}
-            value={formState.questionOption}
+
+          <DropdownComponent
+            fieldName="optionId"
+            title="Option"
+            label="Option"
+            data={option}
+            updatedropdown={handleChange}
           />
-          {error.questionOption ? (
-            <Text style={styles.errorText}>{error.questionOption}</Text>
+          {error.optionId ? (
+            <Text style={styles.errorText}>{error.optionId}</Text>
           ) : null}
+
           <Input
-            placeholder="Enter Question Option Name"
-            label="Question Option Name"
+            placeholder="Enter Description"
+            label="Description"
             disabledInputStyle={styles.containerInput}
-            onChangeText={(text) => handleInputChange("questionOption", text)}
-            value={formState.questionOption}
+            onChangeText={(text) => handleChange("description", text)}
+            value={formState.description}
           />
-          {error.questionOption ? (
-            <Text style={styles.errorText}>{error.questionOption}</Text>
+          {error.description ? (
+            <Text style={styles.errorText}>{error.description}</Text>
+          ) : null}
+
+          <Input
+            placeholder="Enter Display Order"
+            label="Display Order"
+            disabledInputStyle={styles.containerInput}
+            onChangeText={(text) => handleChange("displayOrder", text)}
+            value={formState.displayOrder}
+          />
+          {error.displayOrder ? (
+            <Text style={styles.errorText}>{error.displayOrder}</Text>
           ) : null}
 
           <Button
             title="Create"
             type="outline"
             containerStyle={styles.containerButton}
-            disabled={!showCreateButton()}
+            disabled={!isFormValid()}
             onPress={insertData}
           />
         </Card>
@@ -218,8 +197,8 @@ const QuestionDetailScreen = () => {
         <Card>
           <Card.Title>List Option</Card.Title>
           <CustomTable
-            Tabledata={state.tableData}
-            Tablehead={state.tableHead}
+            Tabledata={tableData}
+            Tablehead={tableHead}
             editIndex={5}
             delIndex={6}
           />

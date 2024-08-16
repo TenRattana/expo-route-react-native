@@ -7,7 +7,7 @@ import { CustomTable } from "../components/index";
 import validator from "validator";
 
 const QuestionOptionScreen = () => {
-  const [list, setList] = useState([]);
+  const [option, setOption] = useState([]);
   const [formState, setFormState] = useState({
     questionOption: "",
   });
@@ -16,25 +16,25 @@ const QuestionOptionScreen = () => {
   });
 
   useEffect(() => {
-    const getQuestionOptions = async () => {
+    const fetchData = async () => {
       try {
-        const response = await axios.post("GetQuestionOptions");
-        setList(response.data || []);
+        const [optionResponse] = await Promise.all([
+          axios.post("GetQuestionOptions")
+        ]);
+        setOption(optionResponse.data || []);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
 
-    getQuestionOptions();
+    fetchData();
   }, []);
 
   const handleInputChange = (fieldName, value) => {
     let errorMessage = "";
 
-    if (fieldName === "questionOption") {
-      if (validator.isEmpty(value.trim())) {
-        errorMessage = "The Question Option Name field is required.";
-      }
+    if (fieldName === "questionOption" && validator.isEmpty(value.trim())) {
+      errorMessage = "The Question Option Name field is required.";
     }
 
     setError((prevError) => ({
@@ -48,13 +48,16 @@ const QuestionOptionScreen = () => {
     }));
   };
 
-  const showCreateButton = () => {
-    return formState.questionOption.trim() !== "" && error.questionOption === "";
+  const isFormValid = () => {
+    return (
+      Object.values(formState).every((value) => String(value).trim() !== "") &&
+      Object.values(error).every((err) => err === "")
+    );
   };
 
   const insertData = async () => {
     const data = {
-        OptionName: formState.questionOption,
+      OptionName: formState.questionOption,
     };
 
     try {
@@ -64,20 +67,17 @@ const QuestionOptionScreen = () => {
       setFormState({ questionOption: "" });
       setError({ questionOption: "" });
       const response = await axios.post("GetQuestionOptions");
-      setList(response.data || []);
+      setOption(response.data || []);
     } catch (error) {
       console.error("Error inserting data:", error);
     }
   };
 
-  const state = {
-    tableHead: ["Question Option Name", "Edit", "Delete"],
-    tableData: list.map((item) => [
-        item.OptionName,
-        item.OptionID,
-        item.OptionID,
-    ]),
-  };
+  const tableData = option.map((item) => {
+    return [item.OptionName, item.OptionID, item.OptionID];
+  });
+
+  const tableHead = ["Question Option Name", "Edit", "Delete"];
 
   return (
     <SafeAreaView style={styles.container}>
@@ -101,7 +101,7 @@ const QuestionOptionScreen = () => {
             title="Create"
             type="outline"
             containerStyle={styles.containerButton}
-            disabled={!showCreateButton()}
+            disabled={!isFormValid()}
             onPress={insertData}
           />
         </Card>
@@ -109,8 +109,8 @@ const QuestionOptionScreen = () => {
         <Card>
           <Card.Title>List Option</Card.Title>
           <CustomTable
-            Tabledata={state.tableData}
-            Tablehead={state.tableHead}
+            Tabledata={tableData}
+            Tablehead={tableHead}
             editIndex={1}
             delIndex={2}
           />

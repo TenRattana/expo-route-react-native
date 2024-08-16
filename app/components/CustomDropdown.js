@@ -4,25 +4,30 @@ import { Dropdown } from "react-native-element-dropdown";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { colors, spacing, fonts } from "../../theme";
 
-const DropdownComponent = ({ fieldName, label, title, data, updatedropdown }) => {
+const DropdownComponent = ({
+  fieldName,
+  label,
+  title,
+  data,
+  updatedropdown,
+}) => {
   const [value, setValue] = useState(null);
   const [option, setOption] = useState([]);
-
+  
   useEffect(() => {
-    const lab = label + "Name";
-    const val = label + "ID";
+    const itemA = label + "Name";
 
     setOption(
       data.map((item) => ({
-        label: item[lab],
-        value: item[val],
+        label: item[itemA],
+        value: item[itemA],
       }))
     );
   }, [data, label]);
 
   const handleDropdownChange = (newValue) => {
     setValue(newValue);
-    updatedropdown(newValue, fieldName);
+    updatedropdown(fieldName, newValue);
   };
 
   const handleClear = () => {
@@ -48,7 +53,12 @@ const DropdownComponent = ({ fieldName, label, title, data, updatedropdown }) =>
         value={value}
         onChange={handleDropdownChange}
         renderLeftIcon={() => (
-          <AntDesign style={styles.icon} color={colors.dark} name="addusergroup" size={20} />
+          <AntDesign
+            style={styles.icon}
+            color={colors.dark}
+            name="addusergroup"
+            size={20}
+          />
         )}
       />
       {value && (

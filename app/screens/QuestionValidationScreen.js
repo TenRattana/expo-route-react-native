@@ -1,46 +1,55 @@
-import { StyleSheet, SafeAreaView, ScrollView, Text } from "react-native";
 import React, { useState, useEffect } from "react";
+import { StyleSheet, SafeAreaView, ScrollView, Text } from "react-native";
 import axios from "../../config/axios";
 import { Button, Card, Input } from "@rneui/themed";
 import { colors, spacing } from "../../theme";
 import { CustomTable } from "../components/index";
+import DropdownComponent from "../components/CustomDropdown";
 import validator from "validator";
 
 const QuestionValidationScreen = () => {
-  const [list, setList] = useState([]);
+  const [rule, setRule] = useState([]);
+  const [validationRule, setValidationRule] = useState([]);
   const [formState, setFormState] = useState({
-    ruleName: "",
-    ruleValue: "",
+    machineGroupId: "",
+    machineName: "",
+    displayOrder: "",
+    description: "",
   });
   const [error, setError] = useState({
-    ruleName: "",
-    ruleValue: "",
+    machineGroupId: "",
+    machineName: "",
+    displayOrder: "",
+    description: "",
   });
 
   useEffect(() => {
-    const getValidationRules = async () => {
+    const fetchData = async () => {
       try {
-        const response = await axios.post("GetValidationRules");
-        setList(response.data || []);
+        const [machineResponse, machineGroupResponse] = await Promise.all([
+          axios.post("GetMachines"),
+          axios.post("GetMachineGroups"),
+        ]);
+        setMachine(machineResponse.data || []);
+        setMachineGroup(machineGroupResponse.data || []);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
 
-    getValidationRules();
+    fetchData();
   }, []);
 
-  const handleInputChange = (fieldName, value) => {
+  const handleChange = (fieldName, value) => {
     let errorMessage = "";
 
-    if (fieldName === "ruleName") {
-      if (validator.isEmpty(value.trim())) {
-        errorMessage = "The Rule Name field is required.";
-      }
-    } else if (fieldName === "ruleValue") {
-      if (validator.isEmpty(value.trim())) {
-        errorMessage = "The Rule Value field is required.";
-      }
+    if (fieldName === "machineName" && validator.isEmpty(value.trim())) {
+      errorMessage = "The Machine Name field is required.";
+    } else if (
+      fieldName === "displayOrder" &&
+      !validator.isNumeric(value.trim())
+    ) {
+      errorMessage = "The Display Order field must be numeric.";
     }
 
     setError((prevError) => ({
@@ -54,89 +63,135 @@ const QuestionValidationScreen = () => {
     }));
   };
 
-  const showCreateButton = () => {
+  const isFormValid = () => {
     return (
-      formState.ruleName.trim() !== "" &&
-      formState.ruleValue.trim() !== "" &&
-      error.ruleName === "" &&
-      error.ruleValue === ""
+      Object.values(formState).every((value) => String(value).trim() !== "") &&
+      Object.values(error).every((err) => err === "")
     );
   };
 
   const insertData = async () => {
     const data = {
-      RuleName: formState.ruleName,
-      RuleValue: formState.ruleValue,
+      MachineGroupID: formState.machineGroupId,
+      MachineName: formState.machineName,
+      DisplayOrder: formState.displayOrder,
+      Description: formState.description,
     };
 
     try {
-      await axios.post("InsertQuestionOption", data, {
+      await axios.post("InsertMachine", data, {
         headers: { "Content-Type": "application/json" },
       });
-      setFormState({ ruleName: "", ruleValue: "" });
-      setError({ ruleName: "", ruleValue: "" });
-      const response = await axios.post("GetValidationRules");
-      setList(response.data || []);
+      setFormState({
+        machineGroupId: "",
+        machineName: "",
+        displayOrder: "",
+        description: "",
+      });
+      setError({
+        machineGroupId: "",
+        machineName: "",
+        displayOrder: "",
+        description: "",
+      });
+      const response = await axios.post("GetMachines");
+      setMachine(response.data || []);
     } catch (error) {
       console.error("Error inserting data:", error);
     }
   };
 
-  const state = {
-    tableHead: ["Rule Name", "Rule Value", "Edit", "Delete"],
-    tableData: list.map((item) => [
-      item.RuleName,
-      item.RuleValue,
-      item.RuleID,
-      item.RuleID,
-    ]),
-  };
+  const tableData = machine.map((item) => {
+    const index = machineGroup.findIndex(
+      (group) => group.MGroupID === item.MGroupID
+    );
+
+    return [
+      index > -1 ? machineGroup[index]?.MGroupName || "" : "",
+      item.MachineName,
+      item.Description,
+      item.DisplayOrder,
+      item.MachineID,
+      item.MachineID,
+    ];
+  });
+
+  const tableHead = [
+    "Machine Group Name",
+    "Machine Name",
+    "Description",
+    "Display Order",
+    "Edit",
+    "Delete",
+  ];
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView}>
         <Card>
-          <Card.Title>Create Rule</Card.Title>
+          <Card.Title>Create Machine</Card.Title>
           <Card.Divider />
 
-          <Input
-            placeholder="Enter Rule Name"
-            label="Rule Name"
-            disabledInputStyle={styles.containerInput}
-            onChangeText={(text) => handleInputChange("ruleName", text)}
-            value={formState.ruleName}
+          <DropdownComponent
+            fieldName="machineGroupId"
+            title="Machine Group"
+            label="MGroup"
+            data={machineGroup}
+            updatedropdown={handleChange}
           />
-          {error.ruleName ? (
-            <Text style={styles.errorText}>{error.ruleName}</Text>
+          {error.machineGroupId ? (
+            <Text style={styles.errorText}>{error.machineGroupId}</Text>
           ) : null}
 
           <Input
-            placeholder="Enter Rule Value"
-            label="Rule Value"
+            placeholder="Enter Machine Name"
+            label="Machine Name"
             disabledInputStyle={styles.containerInput}
-            onChangeText={(text) => handleInputChange("ruleValue", text)}
-            value={formState.ruleValue}
+            onChangeText={(text) => handleChange("machineName", text)}
+            value={formState.machineName}
           />
-          {error.ruleValue ? (
-            <Text style={styles.errorText}>{error.ruleValue}</Text>
+          {error.machineName ? (
+            <Text style={styles.errorText}>{error.machineName}</Text>
+          ) : null}
+
+          <Input
+            placeholder="Enter Display Order"
+            label="Display Order"
+            disabledInputStyle={styles.containerInput}
+            onChangeText={(text) => handleChange("displayOrder", text)}
+            value={formState.displayOrder}
+          />
+          {error.displayOrder ? (
+            <Text style={styles.errorText}>{error.displayOrder}</Text>
+          ) : null}
+
+          <Input
+            placeholder="Enter Description"
+            label="Description"
+            disabledInputStyle={styles.containerInput}
+            onChangeText={(text) => handleChange("description", text)}
+            value={formState.description}
+          />
+          {error.description ? (
+            <Text style={styles.errorText}>{error.description}</Text>
           ) : null}
 
           <Button
             title="Create"
             type="outline"
             containerStyle={styles.containerButton}
-            disabled={!showCreateButton()}
+            disabled={!isFormValid()}
             onPress={insertData}
           />
         </Card>
 
         <Card>
-          <Card.Title>List Option</Card.Title>
+          <Card.Title>List Machine</Card.Title>
           <CustomTable
-            Tabledata={state.tableData}
-            Tablehead={state.tableHead}
-            editIndex={2}
-            delIndex={3}
+            Tabledata={tableData}
+            Tablehead={tableHead}
+            editIndex={4}
+            delIndex={5}
           />
         </Card>
       </ScrollView>
@@ -145,6 +200,12 @@ const QuestionValidationScreen = () => {
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  scrollView: {
+    flex: 1,
+  },
   containerButton: {
     width: 200,
     marginVertical: 10,
