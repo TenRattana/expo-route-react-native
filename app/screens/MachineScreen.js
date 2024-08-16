@@ -5,15 +5,19 @@ import { Button, Card, Input } from "@rneui/themed";
 import { colors, spacing } from "../../theme";
 import { CustomTable } from "../components/index";
 import validator from "validator";
+import DropdownComponent from "../components/CustomDropdown";
 
 const MachineScreen = () => {
-  const [list, setList] = useState([]);
+  const [machine, setMachine] = useState([]);
+  const [machineGroup, setMachineGroup] = useState([]);
   const [formState, setFormState] = useState({
+    machineGroupId: "",
     machineName: "",
     displayOrder: "",
     description: "",
   });
   const [error, setError] = useState({
+    machineGroupId: "",
     machineName: "",
     displayOrder: "",
     description: "",
@@ -23,13 +27,23 @@ const MachineScreen = () => {
     const getMachine = async () => {
       try {
         const response = await axios.post("GetMachines");
-        setList(response.data || []);
+        setMachine(response.data || []);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    const getMachineGroup = async () => {
+      try {
+        const response = await axios.post("GetMachineGroups");
+        setMachineGroup(response.data || []);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
 
     getMachine();
+    getMachineGroup();
   }, []);
 
   const handleInputChange = (fieldName, value) => {
@@ -58,17 +72,27 @@ const MachineScreen = () => {
 
   const showCreateButton = () => {
     return (
+      formState.machineGroupId.trim() !== "" &&
       formState.machineName.trim() !== "" &&
       formState.displayOrder.trim() !== "" &&
       formState.description.trim() !== "" &&
+      error.machineGroupId === "" &&
       error.machineName === "" &&
       error.displayOrder === "" &&
       error.description === ""
     );
   };
 
+  const updatedropdown = (value, fieldName) => {
+    setFormState((prevState) => ({
+      ...prevState,
+      [fieldName]: value,
+    }));
+  };
+
   const insertData = async () => {
     const data = {
+      MachineGroupID: formState.machineGroupId,
       MachineName: formState.machineName,
       DisplayOrder: formState.displayOrder,
       Description: formState.description,
@@ -78,10 +102,20 @@ const MachineScreen = () => {
       await axios.post("InsertMachine", data, {
         headers: { "Content-Type": "application/json" },
       });
-      setFormState({ machineName: "", displayOrder: "" });
-      setError({ machineName: "", displayOrder: "" });
+      setFormState({
+        machineGroupId: "",
+        machineName: "",
+        displayOrder: "",
+        description: "",
+      });
+      setError({
+        machineGroupId: "",
+        machineName: "",
+        displayOrder: "",
+        description: "",
+      });
       const response = await axios.post("GetMachines");
-      setList(response.data || []);
+      setMachine(response.data || []);
     } catch (error) {
       console.error("Error inserting data:", error);
     }
@@ -96,7 +130,7 @@ const MachineScreen = () => {
       "Edit",
       "Delete",
     ],
-    tableData: list.map((item) => [
+    tableData: machine.map((item) => [
       item.MGroupID,
       item.MachineName,
       item.Description,
@@ -112,6 +146,16 @@ const MachineScreen = () => {
         <Card>
           <Card.Title>Create Machine</Card.Title>
           <Card.Divider />
+
+          <DropdownComponent
+            fieldName="machineGroupId"
+            title="MGroup"
+            data={machineGroup}
+            updatedropdown={updatedropdown}
+          />
+          {error.machineGroupId ? (
+            <Text style={styles.errorText}>{error.machineGroupId}</Text>
+          ) : null}
 
           <Input
             placeholder="Enter Machine Name"
@@ -180,7 +224,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.dark,
   },
   errorText: {
-    top:-12,
+    top: -12,
     marginLeft: spacing.sm,
     color: colors.error,
   },

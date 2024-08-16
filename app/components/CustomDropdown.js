@@ -2,15 +2,53 @@ import React, { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 import AntDesign from "@expo/vector-icons/AntDesign";
+import { colors, spacing, fonts } from "../../theme";
 
-const DropdownComponent = ({ title , data }) => {
+const DropdownComponent = ({ fieldName, title, data, updatedropdown }) => {
   const [value, setValue] = useState(null);
-  const [ddata, setDdata] = useState()
+  const [option, setOption] = useState([]);
+
   useEffect(() => {
-    const lab = title + "Name"
-    const val = title + "ID"
-    setDdata(data.map((item) => ({ label: item.lab, value: val })))
-  },[])
+    const lab = title + "Name";
+    const val = title + "ID";
+
+    setOption(
+      data.map((item) => ({
+        label: item[lab],
+        value: item[val],
+      }))
+    );
+  }, [data, title]);
+
+  const handleDropdown = (newValue) => {
+    updatedropdown(newValue, fieldName);
+  };
+
+  const styles = StyleSheet.create({
+    dropdown: {
+      margin: spacing.sm,
+      height: 50,
+      borderBottomColor: "gray",
+      borderBottomWidth: 0.5,
+    },
+    icon: {
+      marginRight: spacing.xxs,
+    },
+    placeholderStyle: {
+      fontSize: fonts.md,
+    },
+    selectedTextStyle: {
+      fontSize: fonts.md,
+    },
+    iconStyle: {
+      width: 20,
+      height: 20,
+    },
+    inputSearchStyle: {
+      height: 40,
+      fontSize: fonts.md,
+    },
+  });
 
   return (
     <Dropdown
@@ -19,7 +57,7 @@ const DropdownComponent = ({ title , data }) => {
       selectedTextStyle={styles.selectedTextStyle}
       inputSearchStyle={styles.inputSearchStyle}
       iconStyle={styles.iconStyle}
-      data={ddata}
+      data={option}
       search
       maxHeight={300}
       labelField="label"
@@ -27,39 +65,12 @@ const DropdownComponent = ({ title , data }) => {
       placeholder={`Select ${title}`}
       searchPlaceholder={`Search ${title}...`}
       value={value}
-      onChange={(item) => {
-        setValue(item.value);
-      }}
+      onChange={handleDropdown}
       renderLeftIcon={() => (
         <AntDesign style={styles.icon} color="black" name="Safety" size={20} />
       )}
     />
   );
 };
-export default DropdownComponent
 
-const styles = StyleSheet.create({
-  dropdown: {
-    margin: 16,
-    height: 50,
-    borderBottomColor: "gray",
-    borderBottomWidth: 0.5,
-  },
-  icon: {
-    marginRight: 5,
-  },
-  placeholderStyle: {
-    fontSize: 16,
-  },
-  selectedTextStyle: {
-    fontSize: 16,
-  },
-  iconStyle: {
-    width: 20,
-    height: 20,
-  },
-  inputSearchStyle: {
-    height: 40,
-    fontSize: 16,
-  },
-});
+export default DropdownComponent;
