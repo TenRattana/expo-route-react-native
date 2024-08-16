@@ -3,7 +3,8 @@ import React, { useState, useEffect } from "react";
 import axios from "../../config/axios";
 import { Button, Card, Input } from "@rneui/themed";
 import { colors, spacing } from "../../theme";
-import { CustomTable, DropdownComponent } from "../components/index";
+import { CustomTable } from "../components/index";
+import DropdownComponent from "../components/CustomDropdown"
 import validator from "validator";
 
 const QuestionDetailScreen = () => {
@@ -156,24 +157,21 @@ const QuestionDetailScreen = () => {
     ]),
   };
 
+  
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView}>
+
         <Card>
           <Card.Title>Create Question Detail</Card.Title>
           <Card.Divider />
 
-          <DropdownComponent />
+          <DropdownComponent  title="Question" data={question}/>
           {error.questionOption ? (
             <Text style={styles.errorText}>{error.questionOption}</Text>
           ) : null}
-          <Input
-            placeholder="Enter Question Option Name"
-            label="Question Option Name"
-            disabledInputStyle={styles.containerInput}
-            onChangeText={(text) => handleInputChange("questionOption", text)}
-            value={formState.questionOption}
-          />
+          <DropdownComponent  title="Option" data={option}/>
           {error.questionOption ? (
             <Text style={styles.errorText}>{error.questionOption}</Text>
           ) : null}

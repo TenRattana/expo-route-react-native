@@ -89,6 +89,7 @@ const MachineScreen = () => {
 
   const state = {
     tableHead: [
+      "Machine Group Name",
       "Machine Name",
       "Description",
       "Display Order",
@@ -96,6 +97,7 @@ const MachineScreen = () => {
       "Delete",
     ],
     tableData: list.map((item) => [
+      item.MGroupID,
       item.MachineName,
       item.Description,
       item.DisplayOrder,

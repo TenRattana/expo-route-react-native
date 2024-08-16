@@ -10,7 +10,6 @@ import QuestionScreen from "./screens/QuestionScreen";
 import QuestionDetailScreen from "./screens/QuestionDetailScreen";
 import QuestionValidationScreen from "./screens/QuestionValidationScreen";
 import QuestionOptionScreen from "./screens/QuestionOptionScreen";
-import DropdownComponent from "./components/DropdownComponent";
 
 const Drawer = createDrawerNavigator();
 
@@ -23,7 +22,6 @@ const Index = () => {
       <Drawer.Screen name="Question Option" component={QuestionOptionScreen} />
       <Drawer.Screen name="Detail Question" component={QuestionDetailScreen} />
       <Drawer.Screen name="Validation" component={QuestionValidationScreen} />
-      <Drawer.Screen name="DropDown" component={DropdownComponent} />
     </Drawer.Navigator>
   );
 };
