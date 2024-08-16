@@ -1,11 +1,11 @@
-import { StyleSheet, SafeAreaView, ScrollView, Text } from "react-native";
 import React, { useState, useEffect } from "react";
+import { StyleSheet, SafeAreaView, ScrollView, Text } from "react-native";
 import axios from "../../config/axios";
 import { Button, Card, Input } from "@rneui/themed";
 import { colors, spacing } from "../../theme";
 import { CustomTable } from "../components/index";
-import validator from "validator";
 import DropdownComponent from "../components/CustomDropdown";
+import validator from "validator";
 
 const MachineScreen = () => {
   const [machine, setMachine] = useState([]);
@@ -24,39 +24,32 @@ const MachineScreen = () => {
   });
 
   useEffect(() => {
-    const getMachine = async () => {
+    const fetchData = async () => {
       try {
-        const response = await axios.post("GetMachines");
-        setMachine(response.data || []);
+        const [machineResponse, machineGroupResponse] = await Promise.all([
+          axios.post("GetMachines"),
+          axios.post("GetMachineGroups"),
+        ]);
+        setMachine(machineResponse.data || []);
+        setMachineGroup(machineGroupResponse.data || []);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
 
-    const getMachineGroup = async () => {
-      try {
-        const response = await axios.post("GetMachineGroups");
-        setMachineGroup(response.data || []);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    getMachine();
-    getMachineGroup();
+    fetchData();
   }, []);
 
   const handleInputChange = (fieldName, value) => {
     let errorMessage = "";
 
-    if (fieldName === "machineName") {
-      if (validator.isEmpty(value.trim())) {
-        errorMessage = "The Machine Name field is required.";
-      }
-    } else if (fieldName === "displayOrder") {
-      if (!validator.isNumeric(value.trim())) {
-        errorMessage = "The Display Order field is Numeric.";
-      }
+    if (fieldName === "machineName" && validator.isEmpty(value.trim())) {
+      errorMessage = "The Machine Name field is required.";
+    } else if (
+      fieldName === "displayOrder" &&
+      !validator.isNumeric(value.trim())
+    ) {
+      errorMessage = "The Display Order field must be numeric.";
     }
 
     setError((prevError) => ({
@@ -70,20 +63,14 @@ const MachineScreen = () => {
     }));
   };
 
-  const showCreateButton = () => {
+  const isFormValid = () => {
     return (
-      formState.machineGroupId.trim() !== "" &&
-      formState.machineName.trim() !== "" &&
-      formState.displayOrder.trim() !== "" &&
-      formState.description.trim() !== "" &&
-      error.machineGroupId === "" &&
-      error.machineName === "" &&
-      error.displayOrder === "" &&
-      error.description === ""
+      Object.values(formState).every((value) => String(value).trim() !== "") &&
+      Object.values(error).every((err) => err === "")
     );
   };
 
-  const updatedropdown = (value, fieldName) => {
+  const handleDropdownChange = (value, fieldName) => {
     setFormState((prevState) => ({
       ...prevState,
       [fieldName]: value,
@@ -121,24 +108,29 @@ const MachineScreen = () => {
     }
   };
 
-  const state = {
-    tableHead: [
-      "Machine Group Name",
-      "Machine Name",
-      "Description",
-      "Display Order",
-      "Edit",
-      "Delete",
-    ],
-    tableData: machine.map((item) => [
-      item.MGroupID,
+  const tableData = machine.map((item) => {
+    const index = machineGroup.findIndex(
+      (group) => group.MGroupID === item.MGroupID
+    );
+    
+    return [
+      index > -1 ? machineGroup[index]?.MGroupName || "" : "",
       item.MachineName,
       item.Description,
       item.DisplayOrder,
       item.MachineID,
       item.MachineID,
-    ]),
-  };
+    ];
+  });
+
+  const tableHead = [
+    "Machine Group Name",
+    "Machine Name",
+    "Description",
+    "Display Order",
+    "Edit",
+    "Delete",
+  ];
 
   return (
     <SafeAreaView style={styles.container}>
@@ -149,9 +141,10 @@ const MachineScreen = () => {
 
           <DropdownComponent
             fieldName="machineGroupId"
-            title="MGroup"
+            title="Machine Group"
+            label="MGroup"
             data={machineGroup}
-            updatedropdown={updatedropdown}
+            updatedropdown={handleDropdownChange}
           />
           {error.machineGroupId ? (
             <Text style={styles.errorText}>{error.machineGroupId}</Text>
@@ -186,7 +179,7 @@ const MachineScreen = () => {
             onChangeText={(text) => handleInputChange("description", text)}
             value={formState.description}
           />
-          {error.displayOrder ? (
+          {error.description ? (
             <Text style={styles.errorText}>{error.description}</Text>
           ) : null}
 
@@ -194,7 +187,7 @@ const MachineScreen = () => {
             title="Create"
             type="outline"
             containerStyle={styles.containerButton}
-            disabled={!showCreateButton()}
+            disabled={!isFormValid()}
             onPress={insertData}
           />
         </Card>
@@ -202,10 +195,10 @@ const MachineScreen = () => {
         <Card>
           <Card.Title>List Machine</Card.Title>
           <CustomTable
-            Tabledata={state.tableData}
-            Tablehead={state.tableHead}
-            editIndex={3}
-            delIndex={4}
+            Tabledata={tableData}
+            Tablehead={tableHead}
+            editIndex={4}
+            delIndex={5}
           />
         </Card>
       </ScrollView>
@@ -214,6 +207,12 @@ const MachineScreen = () => {
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  scrollView: {
+    flex: 1,
+  },
   containerButton: {
     width: 200,
     marginVertical: 10,
