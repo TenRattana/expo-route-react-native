@@ -16,11 +16,12 @@ const DropdownComponent = ({
   
   useEffect(() => {
     const itemA = label + "Name";
+    const itemB = label + "ID";
 
     setOption(
       data.map((item) => ({
         label: item[itemA],
-        value: item[itemA],
+        value: item[itemB],
       }))
     );
   }, [data, label]);

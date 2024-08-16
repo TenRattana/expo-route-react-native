@@ -1,8 +1,8 @@
 import { StyleSheet, View, Text } from "react-native";
 import React from "react";
-import { Icon } from "@rneui/themed";
+import { Icon, Button } from "@rneui/themed";
 import { colors, spacing } from "../../theme";
-import { Table, TableWrapper, Row, Rows } from "react-native-table-component";
+import { Table, TableWrapper, Row, Cell } from "react-native-table-component";
 
 const styles = StyleSheet.create({
   containerTable: {
@@ -22,7 +22,17 @@ const styles = StyleSheet.create({
   },
   row: {
     flexDirection: "row",
+    height: 40,
     backgroundColor: colors.secondary2,
+  },
+  buttonStylew: {
+    backgroundColor: colors.palette.pramaryLight,
+  },
+  buttonStyled: {
+    backgroundColor: colors.danger,
+  },
+  titleStyle: {
+    color: colors.palette.light,
   },
 });
 
@@ -42,7 +52,32 @@ const renderHeader = (header, index, editIndex, delIndex) => {
   return <HeaderCell key={index} header={header} />;
 };
 
-export const CustomTable = ({ Tabledata, Tablehead, editIndex, delIndex }) => (
+const Element = (data, index, action) => {
+  if (action === "edit") {
+    return (
+      <Button
+        type="outline"
+        title="Edit"
+        buttonStyle={styles.buttonStylew}
+        titleStyle={styles.titleStyle}
+        onPress={() => alert(`Index: ${data}`)}
+      />
+    );
+  } else if (action === "del") {
+    return (
+      <Button
+        type="outline"
+        title="Delete"
+        buttonStyle={styles.buttonStyled}
+        titleStyle={styles.titleStyle}
+        onPress={() => alert(`Index: ${data}`)}
+      />
+    );
+  }
+  return null;
+};
+
+export const CustomTable = ({ Tabledata, Tablehead, editIndex, delIndex ,columnStyles}) => (
   <View>
     <Table borderStyle={{ borderWidth: 1 }} style={styles.containerTable}>
       <Row
@@ -52,13 +87,25 @@ export const CustomTable = ({ Tabledata, Tablehead, editIndex, delIndex }) => (
         style={styles.head}
         textStyle={styles.text}
       />
-      <TableWrapper>
-        <Rows
-          data={Tabledata}
-          textStyle={{ margin: spacing.sm }}
-          style={styles.row}
-        />
-      </TableWrapper>
+
+      {Tabledata.map((rowData, index) => (
+        <TableWrapper key={index} style={styles.row} >
+          {rowData.map((cellData, cellIndex) => (
+            <Cell 
+            
+              key={cellIndex}
+              data={
+                cellIndex === editIndex
+                  ? Element(cellData, index, "edit")
+                  : cellIndex === delIndex
+                  ? Element(cellData, index, "del")
+                  : cellData
+              }
+              textStyle={styles.text}
+            />
+          ))}
+        </TableWrapper>
+      ))}
     </Table>
   </View>
 );

@@ -7,14 +7,16 @@ const palette = {
   light: "#ffffff",
   error: "#b00020",
   dark: "#000000",
+  warning: "rgba(255, 193, 7, 1)",
+  danger: "rgba(214, 61, 57, 1)",
+  pramaryLight:'rgba(90, 154, 230, 1)'
 };
 
 export const colors = {
   palette,
-
   text: palette.dark,
-
   background: palette.background,
-
-  error: palette.error
+  error: palette.error,
+  warning: palette.warning,
+  danger: palette.danger,
 };
