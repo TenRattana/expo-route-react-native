@@ -1,13 +1,13 @@
-import React, { Suspense } from 'react';
+import React, { Suspense ,lazy} from 'react';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 
 import HomeScreen from "./screens/HomeScreen";
-const Machine = React.lazy(() => import('./screens/MachineScreen'));
-const QuestionScreen = React.lazy(() => import('./screens/QuestionScreen'));
-const QuestionDetailScreen = React.lazy(() => import('./screens/QuestionDetailScreen'));
-const ValidationScreen = React.lazy(() => import('./screens/ValidationScreen'));
-const QuestionOptionScreen = React.lazy(() => import('./screens/QuestionOptionScreen'));
-const QuestionValidationScreen = React.lazy(() => import('./screens/QuestionValidationScreen'));
+const Machine = lazy(() => import('./screens/MachineScreen'));
+const QuestionScreen = lazy(() => import('./screens/QuestionScreen'));
+const QuestionDetailScreen = lazy(() => import('./screens/QuestionDetailScreen'));
+const ValidationScreen = lazy(() => import('./screens/ValidationScreen'));
+const QuestionOptionScreen = lazy(() => import('./screens/QuestionOptionScreen'));
+const QuestionValidationScreen = lazy(() => import('./screens/QuestionValidationScreen'));
 
 const Drawer = createDrawerNavigator();
 
