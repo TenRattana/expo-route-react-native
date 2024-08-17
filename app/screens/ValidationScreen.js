@@ -15,6 +15,7 @@ const ValidationScreen = () => {
   });
   const [error, setError] = useState({});
   const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -70,6 +71,7 @@ const ValidationScreen = () => {
   };
 
   const saveData = async () => {
+    setIsLoading(true);
     const data = {
       RuleID: formState.ruleId,
       RuleName: formState.ruleName,
@@ -87,9 +89,11 @@ const ValidationScreen = () => {
     } catch (error) {
       console.error("Error inserting data:", error);
     }
+    setIsLoading(false);
   };
 
   const handleAction = async (action, item) => {
+    setIsLoading(true);
     try {
       if (action === "edit") {
         const response = await axios.post("GetValidationRule", {
@@ -112,6 +116,7 @@ const ValidationScreen = () => {
     } catch (error) {
       console.error("Error fetching machine data:", error);
     }
+    setIsLoading(false);
   };
 
   const tableData = validation.map((item) => {
@@ -156,6 +161,7 @@ const ValidationScreen = () => {
               containerStyle={styles.containerButton}
               disabled={!isFormValid()}
               onPress={saveData}
+              loading={isLoading}
             />
             <Button
               title="Reset"

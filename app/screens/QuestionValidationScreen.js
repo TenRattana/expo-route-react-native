@@ -22,6 +22,7 @@ const QuestionValidationScreen = () => {
     description: "",
   });
   const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -87,6 +88,7 @@ const QuestionValidationScreen = () => {
   };
 
   const saveData = async () => {
+    setIsLoading(true);
     const data = {
       MachineGroupID: formState.machineGroupId,
       MachineName: formState.machineName,
@@ -115,6 +117,7 @@ const QuestionValidationScreen = () => {
     } catch (error) {
       console.error("Error inserting data:", error);
     }
+    setIsLoading(false);
   };
 
   const handleAction = (action, item) => {
@@ -203,6 +206,7 @@ const QuestionValidationScreen = () => {
               containerStyle={styles.containerButton}
               disabled={!isFormValid()}
               onPress={saveData}
+              loading={isLoading}
             />
             <Button
               title="Reset"

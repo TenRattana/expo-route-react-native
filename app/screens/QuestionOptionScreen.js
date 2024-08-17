@@ -14,6 +14,7 @@ const QuestionOptionScreen = () => {
   });
   const [error, setError] = useState({});
   const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -67,6 +68,7 @@ const QuestionOptionScreen = () => {
   };
 
   const saveData = async () => {
+    setIsLoading(true);
     const data = {
       OptionID: formState.questionOptionId,
       OptionName: formState.questionOptionName,
@@ -83,9 +85,11 @@ const QuestionOptionScreen = () => {
     } catch (error) {
       console.error("Error inserting data:", error);
     }
+    setIsLoading(false);
   };
 
   const handleAction = async (action, item) => {
+    setIsLoading(true);
     try {
       if (action === "edit") {
         const response = await axios.post("GetQuestionOption", {
@@ -107,6 +111,7 @@ const QuestionOptionScreen = () => {
     } catch (error) {
       console.error("Error fetching question option data:", error);
     }
+    setIsLoading(false);
   };
 
   const tableData = option.map((item) => {
@@ -140,6 +145,7 @@ const QuestionOptionScreen = () => {
               containerStyle={styles.containerButton}
               disabled={!isFormValid()}
               onPress={saveData}
+              loading={isLoading}
             />
             <Button
               title="Reset"

@@ -14,6 +14,7 @@ const QuestionForm = () => {
   });
   const [error, setError] = useState({});
   const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -67,6 +68,7 @@ const QuestionForm = () => {
   };
 
   const saveData = async () => {
+    setIsLoading(true);
     const data = {
       QuestionID: formState.questionId,
       QuestionName: formState.questionName,
@@ -84,9 +86,11 @@ const QuestionForm = () => {
     } catch (error) {
       console.error("Error saving data:", error);
     }
+    setIsLoading(false);
   };
 
   const handleAction = async (action, item) => {
+    setIsLoading(true);
     try {
       if (action === "edit") {
         const response = await axios.post("GetQuestion", { QuestionID: item });
@@ -106,6 +110,7 @@ const QuestionForm = () => {
     } catch (error) {
       console.error("Error fetching question data:", error);
     }
+    setIsLoading(false);
   };
 
   const tableData = question.map((item) => {
@@ -138,6 +143,7 @@ const QuestionForm = () => {
               containerStyle={styles.containerButton}
               disabled={!isFormValid()}
               onPress={saveData}
+              loading={isLoading}
             />
             <Button
               title="Reset"

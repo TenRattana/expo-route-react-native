@@ -21,6 +21,7 @@ const QuestionDetailScreen = () => {
   const [error, setError] = useState({});
   const [resetDropdown, setResetDropdown] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -91,6 +92,7 @@ const QuestionDetailScreen = () => {
   };
 
   const saveData = async () => {
+    setIsLoading(true);
     const data = {
       MQOtionID: formState.mqotionId,
       MOptionID: formState.moptionId,
@@ -120,9 +122,11 @@ const QuestionDetailScreen = () => {
     } catch (error) {
       console.error("Error inserting data:", error);
     }
+    setIsLoading(false);
   };
 
   const handleAction = async (action, item) => {
+    setIsLoading(true);
     try {
       if (action === "edit") {
         const response = await axios.post("GetQuestionDetail", {
@@ -148,6 +152,7 @@ const QuestionDetailScreen = () => {
     } catch (error) {
       console.error("Error fetching machine data:", error);
     }
+    setIsLoading(false);
   };
 
   const tableData = detailQuestion.map((item) => {
@@ -237,6 +242,7 @@ const QuestionDetailScreen = () => {
               containerStyle={styles.containerButton}
               disabled={!isFormValid()}
               onPress={saveData}
+              loading={isLoading}
             />
             <Button
               title="Reset"

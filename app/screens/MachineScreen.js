@@ -3,7 +3,7 @@ import { StyleSheet, SafeAreaView, ScrollView, Text, View } from "react-native";
 import axios from "../../config/axios";
 import { Button, Card, Input } from "@rneui/themed";
 import { colors, spacing } from "../../theme";
-import { CustomTable, CustomDropdown  } from "../components";
+import { CustomTable, CustomDropdown } from "../components";
 import validator from "validator";
 
 const MachineScreen = () => {
@@ -19,6 +19,7 @@ const MachineScreen = () => {
   const [error, setError] = useState({});
   const [resetDropdown, setResetDropdown] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -85,6 +86,7 @@ const MachineScreen = () => {
   };
 
   const saveData = async () => {
+    setIsLoading(true);
     const data = {
       MachineID: formState.machineId,
       MachineGroupID: formState.machineGroupId,
@@ -113,9 +115,11 @@ const MachineScreen = () => {
     } catch (error) {
       console.error("Error saving data:", error);
     }
+    setIsLoading(false);
   };
 
   const handleAction = async (action, item) => {
+    setIsLoading(true);
     try {
       if (action === "edit") {
         const response = await axios.post("GetMachine", { machineID: item });
@@ -138,6 +142,7 @@ const MachineScreen = () => {
     } catch (error) {
       console.error("Error fetching machine data:", error);
     }
+    setIsLoading(false);
   };
 
   const tableData = machine.map((item) => {
@@ -224,6 +229,7 @@ const MachineScreen = () => {
               containerStyle={styles.containerButton}
               disabled={!isFormValid()}
               onPress={saveData}
+              loading={isLoading}
             />
             <Button
               title="Reset"
