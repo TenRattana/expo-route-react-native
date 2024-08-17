@@ -4,7 +4,7 @@ import { Dropdown } from "react-native-element-dropdown";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { colors, spacing, fonts } from "../../theme";
 
-const DropdownComponent = ({
+export const CustomDropdown = ({
   fieldName,
   label,
   title,
@@ -110,5 +110,3 @@ const styles = StyleSheet.create({
     top: spacing.lg,
   },
 });
-
-export default DropdownComponent;

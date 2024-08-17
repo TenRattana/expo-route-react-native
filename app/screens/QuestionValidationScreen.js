@@ -3,8 +3,7 @@ import { StyleSheet, SafeAreaView, ScrollView, Text, View } from "react-native";
 import axios from "../../config/axios";
 import { Button, Card, Input } from "@rneui/themed";
 import { colors, spacing } from "../../theme";
-import { CustomTable } from "../components/index";
-import DropdownComponent from "../components/CustomDropdown";
+import { CustomTable } from "../components";
 import validator from "validator";
 
 const QuestionValidationScreen = () => {

@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import axios from "../../config/axios";
 import { Button, Card, Input } from "@rneui/themed";
 import { colors, spacing } from "../../theme";
-import { CustomTable } from "../components/index";
+import { CustomTable } from "../components";
 import validator from "validator";
 
 const QuestionForm = () => {

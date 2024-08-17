@@ -3,8 +3,7 @@ import React, { useState, useEffect } from "react";
 import axios from "../../config/axios";
 import { Button, Card, Input } from "@rneui/themed";
 import { colors, spacing } from "../../theme";
-import { CustomTable } from "../components/index";
-import DropdownComponent from "../components/CustomDropdown";
+import { CustomTable , CustomDropdown } from "../components";
 import validator from "validator";
 
 const QuestionDetailScreen = () => {
@@ -183,7 +182,7 @@ const QuestionDetailScreen = () => {
           <Card.Title>Create Question Detail</Card.Title>
           <Card.Divider />
 
-          <DropdownComponent
+          <CustomDropdown
             fieldName="questionId"
             title="Question"
             label="Question"
@@ -196,7 +195,7 @@ const QuestionDetailScreen = () => {
             <Text style={styles.errorText}>{error.questionId}</Text>
           ) : null}
 
-          <DropdownComponent
+          <CustomDropdown
             fieldName="optionId"
             title="Option"
             label="Option"
