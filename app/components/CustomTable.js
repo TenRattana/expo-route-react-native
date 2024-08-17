@@ -1,8 +1,8 @@
 import { StyleSheet, View, Text } from "react-native";
 import React from "react";
 import { Icon, Button } from "@rneui/themed";
-import { colors, spacing } from "../../theme";
 import { Table, TableWrapper, Row, Cell } from "react-native-table-component";
+import { colors, spacing, fonts } from "../../theme";
 
 const styles = StyleSheet.create({
   containerTable: {
@@ -34,6 +34,11 @@ const styles = StyleSheet.create({
   titleStyle: {
     color: colors.palette.light,
   },
+  text: {
+    fontSize: 14,
+    alignSelf: "center",
+    color: colors.dark,
+  },
 });
 
 const HeaderCell = ({ header, iconName }) => (
@@ -52,7 +57,11 @@ const renderHeader = (header, index, editIndex, delIndex) => {
   return <HeaderCell key={index} header={header} />;
 };
 
-const Element = (data, index, action) => {
+const Element = (data, index, action, handleAction) => {
+  const handlePress = () => {
+    handleAction(action, data);
+  };
+
   if (action === "edit") {
     return (
       <Button
@@ -60,7 +69,7 @@ const Element = (data, index, action) => {
         title="Edit"
         buttonStyle={styles.buttonStylew}
         titleStyle={styles.titleStyle}
-        onPress={() => alert(`Index: ${data}`)}
+        onPress={handlePress}
       />
     );
   } else if (action === "del") {
@@ -70,14 +79,14 @@ const Element = (data, index, action) => {
         title="Delete"
         buttonStyle={styles.buttonStyled}
         titleStyle={styles.titleStyle}
-        onPress={() => alert(`Index: ${data}`)}
+        onPress={handlePress}
       />
     );
   }
   return null;
 };
 
-export const CustomTable = ({ Tabledata, Tablehead, editIndex, delIndex ,columnStyles}) => (
+export const CustomTable = ({ Tabledata, Tablehead, editIndex, delIndex, handleAction }) => (
   <View>
     <Table borderStyle={{ borderWidth: 1 }} style={styles.containerTable}>
       <Row
@@ -89,19 +98,18 @@ export const CustomTable = ({ Tabledata, Tablehead, editIndex, delIndex ,columnS
       />
 
       {Tabledata.map((rowData, index) => (
-        <TableWrapper key={index} style={styles.row} >
+        <TableWrapper key={index} style={styles.row}>
           {rowData.map((cellData, cellIndex) => (
-            <Cell 
-            
+            <Cell
               key={cellIndex}
               data={
                 cellIndex === editIndex
-                  ? Element(cellData, index, "edit")
+                  ? Element(cellData, index, "edit", handleAction)
                   : cellIndex === delIndex
-                  ? Element(cellData, index, "del")
+                  ? Element(cellData, index, "del", handleAction)
                   : cellData
               }
-              textStyle={styles.text}
+              textStyle={styles.text} 
             />
           ))}
         </TableWrapper>

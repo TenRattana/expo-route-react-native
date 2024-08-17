@@ -11,10 +11,11 @@ const QuestionValidationScreen = () => {
   const [rule, setRule] = useState([]);
   const [validationRule, setValidationRule] = useState([]);
   const [formState, setFormState] = useState({
-    machineGroupId: "",
-    machineName: "",
-    displayOrder: "",
-    description: "",
+    
+    machineGroupId: null,
+    machineName: null,
+    displayOrder: null,
+    description: null,
   });
   const [error, setError] = useState({
     machineGroupId: "",
@@ -101,6 +102,10 @@ const QuestionValidationScreen = () => {
     }
   };
 
+  const handleAction = (action, item) => {
+    console.log(action , item);
+  }
+  
   const tableData = machine.map((item) => {
     const index = machineGroup.findIndex(
       (group) => group.MGroupID === item.MGroupID
@@ -192,6 +197,7 @@ const QuestionValidationScreen = () => {
             Tablehead={tableHead}
             editIndex={4}
             delIndex={5}
+            handleAction={handleAction}
           />
         </Card>
       </ScrollView>

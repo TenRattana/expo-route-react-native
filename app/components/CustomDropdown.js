@@ -10,30 +10,39 @@ const DropdownComponent = ({
   title,
   data,
   updatedropdown,
+  reset, 
+  selectedValue,
 }) => {
-  const [value, setValue] = useState(null);
+  const [value, setValue] = useState( null);
   const [option, setOption] = useState([]);
   
   useEffect(() => {
-    const itemA = label + "Name";
-    const itemB = label + "ID";
-
     setOption(
       data.map((item) => ({
-        label: item[itemA],
-        value: item[itemB],
+        label: item[label + "Name"],
+        value: item[label + "ID"],
       }))
     );
   }, [data, label]);
 
+  useEffect(() => {
+    if (reset) {
+      setValue(null);
+    }
+  }, [reset]);
+
+  useEffect(() => {
+    setValue(selectedValue || null);
+  }, [selectedValue]);
+
   const handleDropdownChange = (newValue) => {
     setValue(newValue);
-    updatedropdown(fieldName, newValue);
+    updatedropdown(fieldName, newValue.value);
   };
 
   const handleClear = () => {
     setValue(null);
-    updatedropdown(null, fieldName);
+    updatedropdown(fieldName, null);
   };
 
   return (

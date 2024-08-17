@@ -9,13 +9,11 @@ import validator from "validator";
 const ValidationScreen = () => {
   const [validation, setValidation] = useState([]);
   const [formState, setFormState] = useState({
-    ruleName: "",
-    ruleValue: "",
+    ruleId: null,
+    ruleName: null,
+    ruleValue: null,
   });
-  const [error, setError] = useState({
-    ruleName: "",
-    ruleValue: "",
-  });
+  const [error, setError] = useState({});
 
   useEffect(() => {
     const fetchData = async () => {
@@ -32,7 +30,7 @@ const ValidationScreen = () => {
     fetchData();
   }, []);
 
-  const handleInputChange = (fieldName, value) => {
+  const handleChange = (fieldName, value) => {
     let errorMessage = "";
 
     if (fieldName === "ruleName" && validator.isEmpty(value.trim())) {
@@ -54,27 +52,54 @@ const ValidationScreen = () => {
 
   const isFormValid = () => {
     return (
-      Object.values(formState).every((value) => String(value).trim() !== "") &&
-      Object.values(error).every((err) => err === "")
+      Object.values(formState).every(
+        (value) => value === "" || value === null || value.trim() !== ""
+      ) && Object.values(error).every((err) => err === "")
     );
   };
 
-  const insertData = async () => {
+  const saveData = async () => {
     const data = {
+      RuleID: formState.ruleId,
       RuleName: formState.ruleName,
       RuleValue: formState.ruleValue,
     };
 
     try {
-      await axios.post("InsertQuestionOption", data, {
+      await axios.post("SaveValidation", data, {
         headers: { "Content-Type": "application/json" },
       });
-      setFormState({ ruleName: "", ruleValue: "" });
-      setError({ ruleName: "", ruleValue: "" });
+      setFormState({ ruleId: null, ruleName: null, ruleValue: null });
+      setError({});
       const response = await axios.post("GetValidationRules");
       setValidation(response.data || []);
     } catch (error) {
       console.error("Error inserting data:", error);
+    }
+  };
+
+  const handleAction = async (action, item) => {
+    try {
+      if (action === "edit") {
+        const response = await axios.post("GetValidationRule", {
+          RuleID: item,
+        });
+        const validationData = response.data[0] || {};
+
+        setFormState({
+          ruleId: validationData.RuleID || null,
+          ruleName: validationData.RuleName || null,
+          ruleValue: validationData.RuleValue || null,
+        });
+      } else if (action === "del") {
+        const response1 = await axios.post("DeleteValidation", {
+          RuleID: item,
+        });
+        const response2 = await axios.post("GetValidationRules");
+        setValidation(response2.data || []);
+      }
+    } catch (error) {
+      console.error("Error fetching machine data:", error);
     }
   };
 
@@ -95,7 +120,7 @@ const ValidationScreen = () => {
             placeholder="Enter Rule Name"
             label="Rule Name"
             disabledInputStyle={styles.containerInput}
-            onChangeText={(text) => handleInputChange("ruleName", text)}
+            onChangeText={(text) => handleChange("ruleName", text)}
             value={formState.ruleName}
           />
           {error.ruleName ? (
@@ -106,7 +131,7 @@ const ValidationScreen = () => {
             placeholder="Enter Rule Value"
             label="Rule Value"
             disabledInputStyle={styles.containerInput}
-            onChangeText={(text) => handleInputChange("ruleValue", text)}
+            onChangeText={(text) => handleChange("ruleValue", text)}
             value={formState.ruleValue}
           />
           {error.ruleValue ? (
@@ -118,7 +143,7 @@ const ValidationScreen = () => {
             type="outline"
             containerStyle={styles.containerButton}
             disabled={!isFormValid()}
-            onPress={insertData}
+            onPress={saveData}
           />
         </Card>
 
@@ -129,6 +154,7 @@ const ValidationScreen = () => {
             Tablehead={tableHead}
             editIndex={2}
             delIndex={3}
+            handleAction={handleAction}
           />
         </Card>
       </ScrollView>

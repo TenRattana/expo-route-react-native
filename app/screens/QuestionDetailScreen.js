@@ -12,17 +12,15 @@ const QuestionDetailScreen = () => {
   const [question, setQuestion] = useState([]);
   const [option, setOption] = useState([]);
   const [formState, setFormState] = useState({
-    questionId: "",
-    optionId: "",
-    displayOrder: "",
-    description: "",
+    mqotionId: null,
+    moptionId: null,
+    questionId: null,
+    optionId: null,
+    displayOrder: null,
+    description: null,
   });
-  const [error, setError] = useState({
-    questionId: "",
-    optionId: "",
-    displayOrder: "",
-    description: "",
-  });
+  const [error, setError] = useState({});
+  const [resetDropdown, setResetDropdown] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -69,54 +67,80 @@ const QuestionDetailScreen = () => {
 
   const isFormValid = () => {
     return (
-      Object.values(formState).every((value) => String(value).trim() !== "") &&
-      Object.values(error).every((err) => err === "")
+      Object.values(formState).every(
+        (value) => value === "" || value === null || value.trim() !== ""
+      ) && Object.values(error).every((err) => err === "")
     );
   };
 
-  const insertData = async () => {
+  const saveData = async () => {
     const data = {
+      MQOtionID: formState.mqotionId,
+      MOptionID: formState.moptionId,
       QuestionID: formState.questionId,
       OptionID: formState.optionId,
-      DisplayOrder: formState.displayOrder,
-      Description: formState.description,
+      Description: formState.displayOrder,
+      DisplayOrder: formState.description,
     };
 
     try {
-      await axios.post("InsertQuestionDetail", data, {
+      await axios.post("SaveQuestionDetail", data, {
         headers: { "Content-Type": "application/json" },
       });
       setFormState({
-        questionId: "",
-        optionId: "",
-        displayOrder: "",
-        description: "",
+        mqotionId: null,
+        moptionId: null,
+        questionId: null,
+        optionId: null,
+        displayOrder: null,
+        description: null,
       });
-      setError({
-        questionId: "",
-        optionId: "",
-        displayOrder: "",
-        description: "",
-      });
+      setError({});
       const response = await axios.post("GetQuestionDetails");
       setDetailQuestion(response.data || []);
+      setResetDropdown(true);
+      setTimeout(() => setResetDropdown(false), 0);
     } catch (error) {
       console.error("Error inserting data:", error);
     }
   };
 
+  const handleAction = async (action, item) => {
+    try {
+      if (action === "edit") {
+        const response = await axios.post("GetQuestionDetail", {
+          MQOtionID: item,
+        });
+        const questionDetailData = response.data[0] || {};
+
+        setFormState({
+          mqotionId: questionDetailData.ID,
+          moptionId: questionDetailData.MOptionID,
+          questionId: questionDetailData.QuestionID,
+          optionId: questionDetailData.OptionID,
+          displayOrder: String(questionDetailData.DisplayOrder),
+          description: questionDetailData.Description,
+        });
+      } else if (action === "del") {
+        const response1 = await axios.post("DeleteQuestionDetail", {
+          MachineID: item,
+        });
+        const response2 = await axios.post("GetQuestionDetails");
+        setDetailQuestion(response2.data || []);
+      }
+    } catch (error) {
+      console.error("Error fetching machine data:", error);
+    }
+  };
+
   const tableData = detailQuestion.map((item) => {
-    const indexQ = question.findIndex(
-      (group) => group.QuestionID === item.QuestionID
-    );
-    const indexO = option.findIndex(
-      (group) => group.OptionID === item.OptionID
-    );
+    const q = question.find((group) => group.QuestionID === item.QuestionID);
+    const o = option.find((group) => group.OptionID === item.OptionID);
 
     return [
       item.MOptionID,
-      indexQ > -1 ? question[indexQ]?.QuestionName || "" : "",
-      indexO > -1 ? option[indexO]?.OptionName || "" : "",
+      q ? q.QuestionName : "",
+      o ? o.OptionName : "",
       item.Description,
       item.DisplayOrder,
       item.ID,
@@ -147,6 +171,8 @@ const QuestionDetailScreen = () => {
             label="Question"
             data={question}
             updatedropdown={handleChange}
+            reset={resetDropdown}
+            selectedValue={formState.questionId}
           />
           {error.questionId ? (
             <Text style={styles.errorText}>{error.questionId}</Text>
@@ -158,6 +184,8 @@ const QuestionDetailScreen = () => {
             label="Option"
             data={option}
             updatedropdown={handleChange}
+            reset={resetDropdown}
+            selectedValue={formState.optionId}
           />
           {error.optionId ? (
             <Text style={styles.errorText}>{error.optionId}</Text>
@@ -190,7 +218,7 @@ const QuestionDetailScreen = () => {
             type="outline"
             containerStyle={styles.containerButton}
             disabled={!isFormValid()}
-            onPress={insertData}
+            onPress={saveData}
           />
         </Card>
 
@@ -201,6 +229,7 @@ const QuestionDetailScreen = () => {
             Tablehead={tableHead}
             editIndex={5}
             delIndex={6}
+            handleAction={handleAction}
           />
         </Card>
       </ScrollView>

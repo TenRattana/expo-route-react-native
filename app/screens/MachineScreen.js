@@ -11,17 +11,14 @@ const MachineScreen = () => {
   const [machine, setMachine] = useState([]);
   const [machineGroup, setMachineGroup] = useState([]);
   const [formState, setFormState] = useState({
-    machineGroupId: "",
-    machineName: "",
-    displayOrder: "",
-    description: "",
+    machineId: null,
+    machineGroupId: null,
+    machineName: null,
+    displayOrder: null,
+    description: null,
   });
-  const [error, setError] = useState({
-    machineGroupId: "",
-    machineName: "",
-    displayOrder: "",
-    description: "",
-  });
+  const [error, setError] = useState({});
+  const [resetDropdown, setResetDropdown] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -65,13 +62,15 @@ const MachineScreen = () => {
 
   const isFormValid = () => {
     return (
-      Object.values(formState).every((value) => String(value).trim() !== "") &&
-      Object.values(error).every((err) => err === "")
+      Object.values(formState).every(
+        (value) => value === "" || value === null || value.trim() !== ""
+      ) && Object.values(error).every((err) => err === "")
     );
   };
 
-  const insertData = async () => {
+  const saveData = async () => {
     const data = {
+      MachineID: formState.machineId,
       MachineGroupID: formState.machineGroupId,
       MachineName: formState.machineName,
       DisplayOrder: formState.displayOrder,
@@ -79,35 +78,57 @@ const MachineScreen = () => {
     };
 
     try {
-      await axios.post("InsertMachine", data, {
+      await axios.post("SaveMachine", data, {
         headers: { "Content-Type": "application/json" },
       });
       setFormState({
-        machineGroupId: "",
-        machineName: "",
-        displayOrder: "",
-        description: "",
+        machineId: null,
+        machineGroupId: null,
+        machineName: null,
+        displayOrder: null,
+        description: null,
       });
-      setError({
-        machineGroupId: "",
-        machineName: "",
-        displayOrder: "",
-        description: "",
-      });
+      setError({});
       const response = await axios.post("GetMachines");
       setMachine(response.data || []);
+      setResetDropdown(true);
+      setTimeout(() => setResetDropdown(false), 0);
     } catch (error) {
-      console.error("Error inserting data:", error);
+      console.error("Error saving data:", error);
+    }
+  };
+
+  const handleAction = async (action, item) => {
+    try {
+      if (action === "edit") {
+        const response = await axios.post("GetMachine", { machineID: item });
+        const machineData = response.data[0] || {};
+
+        setFormState({
+          machineId: machineData.MachineID || null,
+          machineGroupId: machineData.MGroupID || null,
+          machineName: machineData.MachineName || null,
+          description: machineData.Description || null,
+          displayOrder: String(machineData.DisplayOrder) || null,
+        });
+      } else if (action === "del") {
+        const response1 = await axios.post("DeleteMachine", {
+          MachineID: item,
+        });
+        const response2 = await axios.post("GetMachines");
+        setMachine(response2.data || []);
+      }
+    } catch (error) {
+      console.error("Error fetching machine data:", error);
     }
   };
 
   const tableData = machine.map((item) => {
-    const index = machineGroup.findIndex(
+    const group = machineGroup.find(
       (group) => group.MGroupID === item.MGroupID
     );
-    
     return [
-      index > -1 ? machineGroup[index]?.MGroupName || "" : "",
+      group ? group.MGroupName : "",
       item.MachineName,
       item.Description,
       item.DisplayOrder,
@@ -138,10 +159,13 @@ const MachineScreen = () => {
             label="MGroup"
             data={machineGroup}
             updatedropdown={handleChange}
+            reset={resetDropdown}
+            selectedValue={formState.machineGroupId}
           />
-          {error.machineGroupId ? (
+
+          {error.machineGroupId && (
             <Text style={styles.errorText}>{error.machineGroupId}</Text>
-          ) : null}
+          )}
 
           <Input
             placeholder="Enter Machine Name"
@@ -150,20 +174,9 @@ const MachineScreen = () => {
             onChangeText={(text) => handleChange("machineName", text)}
             value={formState.machineName}
           />
-          {error.machineName ? (
+          {error.machineName && (
             <Text style={styles.errorText}>{error.machineName}</Text>
-          ) : null}
-
-          <Input
-            placeholder="Enter Display Order"
-            label="Display Order"
-            disabledInputStyle={styles.containerInput}
-            onChangeText={(text) => handleChange("displayOrder", text)}
-            value={formState.displayOrder}
-          />
-          {error.displayOrder ? (
-            <Text style={styles.errorText}>{error.displayOrder}</Text>
-          ) : null}
+          )}
 
           <Input
             placeholder="Enter Description"
@@ -172,16 +185,27 @@ const MachineScreen = () => {
             onChangeText={(text) => handleChange("description", text)}
             value={formState.description}
           />
-          {error.description ? (
+          {error.description && (
             <Text style={styles.errorText}>{error.description}</Text>
-          ) : null}
+          )}
+
+          <Input
+            placeholder="Enter Display Order"
+            label="Display Order"
+            disabledInputStyle={styles.containerInput}
+            onChangeText={(text) => handleChange("displayOrder", text)}
+            value={formState.displayOrder}
+          />
+          {error.displayOrder && (
+            <Text style={styles.errorText}>{error.displayOrder}</Text>
+          )}
 
           <Button
             title="Create"
             type="outline"
             containerStyle={styles.containerButton}
             disabled={!isFormValid()}
-            onPress={insertData}
+            onPress={saveData}
           />
         </Card>
 
@@ -192,6 +216,7 @@ const MachineScreen = () => {
             Tablehead={tableHead}
             editIndex={4}
             delIndex={5}
+            handleAction={handleAction}
           />
         </Card>
       </ScrollView>

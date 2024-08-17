@@ -9,17 +9,16 @@ import validator from "validator";
 const QuestionOptionScreen = () => {
   const [option, setOption] = useState([]);
   const [formState, setFormState] = useState({
-    questionOption: "",
+    questionOptionId: null,
+    questionOptionName: null,
   });
-  const [error, setError] = useState({
-    questionOption: "",
-  });
+  const [error, setError] = useState({});
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const [optionResponse] = await Promise.all([
-          axios.post("GetQuestionOptions")
+          axios.post("GetQuestionOptions"),
         ]);
         setOption(optionResponse.data || []);
       } catch (error) {
@@ -30,10 +29,10 @@ const QuestionOptionScreen = () => {
     fetchData();
   }, []);
 
-  const handleInputChange = (fieldName, value) => {
+  const handleChange = (fieldName, value) => {
     let errorMessage = "";
 
-    if (fieldName === "questionOption" && validator.isEmpty(value.trim())) {
+    if (fieldName === "questionOptionName" && validator.isEmpty(value.trim())) {
       errorMessage = "The Question Option Name field is required.";
     }
 
@@ -50,26 +49,50 @@ const QuestionOptionScreen = () => {
 
   const isFormValid = () => {
     return (
-      Object.values(formState).every((value) => String(value).trim() !== "") &&
-      Object.values(error).every((err) => err === "")
+      Object.values(formState).every(
+        (value) => value === "" || value === null || value.trim() !== ""
+      ) && Object.values(error).every((err) => err === "")
     );
   };
 
-  const insertData = async () => {
+  const saveData = async () => {
     const data = {
-      OptionName: formState.questionOption,
+      OptionID: formState.questionOptionId,
+      OptionName: formState.questionOptionName,
     };
 
     try {
-      await axios.post("InsertQuestionOption", data, {
+      await axios.post("SaveQuestionOption", data, {
         headers: { "Content-Type": "application/json" },
       });
-      setFormState({ questionOption: "" });
-      setError({ questionOption: "" });
+      setFormState({ questionOptionId: null, questionOptionName: null });
+      setError({});
       const response = await axios.post("GetQuestionOptions");
       setOption(response.data || []);
     } catch (error) {
       console.error("Error inserting data:", error);
+    }
+  };
+
+  const handleAction = async (action, item) => {
+    try {
+      if (action === "edit") {
+        const response = await axios.post("GetQuestionOption", { OptionID: item });
+        const questionoptionData = response.data[0] || {};
+
+        setFormState({
+          questionOptionId: questionoptionData.OptionID || null,
+          questionOptionName: questionoptionData.OptionName || null,
+        });
+      } else if (action === "del") {
+        const response1 = await axios.post("DeleteQuestionOption", {
+          QuestionID: item,
+        });
+        const response2 = await axios.post("GetQuestionOptions");
+        setOption(response2.data || []);
+      }
+    } catch (error) {
+      console.error("Error fetching question option data:", error);
     }
   };
 
@@ -90,11 +113,11 @@ const QuestionOptionScreen = () => {
             placeholder="Enter Question Option Name"
             label="Question Option Name"
             disabledInputStyle={styles.containerInput}
-            onChangeText={(text) => handleInputChange("questionOption", text)}
-            value={formState.questionOption}
+            onChangeText={(text) => handleChange("questionOptionName", text)}
+            value={formState.questionOptionName}
           />
-          {error.questionOption ? (
-            <Text style={styles.errorText}>{error.questionOption}</Text>
+          {error.questionOptionName ? (
+            <Text style={styles.errorText}>{error.questionOptionName}</Text>
           ) : null}
 
           <Button
@@ -102,7 +125,7 @@ const QuestionOptionScreen = () => {
             type="outline"
             containerStyle={styles.containerButton}
             disabled={!isFormValid()}
-            onPress={insertData}
+            onPress={saveData}
           />
         </Card>
 
@@ -113,6 +136,7 @@ const QuestionOptionScreen = () => {
             Tablehead={tableHead}
             editIndex={1}
             delIndex={2}
+            handleAction={handleAction}
           />
         </Card>
       </ScrollView>

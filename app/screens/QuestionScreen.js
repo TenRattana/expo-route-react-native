@@ -9,11 +9,10 @@ import validator from "validator";
 const QuestionForm = () => {
   const [question, setQuestion] = useState([]);
   const [formState, setFormState] = useState({
-    questionName: "",
+    questionId: null,
+    questionName: null,
   });
-  const [error, setError] = useState({
-    questionName: "",
-  });
+  const [error, setError] = useState({});
 
   useEffect(() => {
     const fetchData = async () => {
@@ -30,7 +29,7 @@ const QuestionForm = () => {
     fetchData();
   }, []);
 
-  const handleInputChange = (fieldName, value) => {
+  const handleChange = (fieldName, value) => {
     let errorMessage = "";
 
     if (fieldName === "questionName" && validator.isEmpty(value.trim())) {
@@ -50,26 +49,50 @@ const QuestionForm = () => {
 
   const isFormValid = () => {
     return (
-      Object.values(formState).every((value) => String(value).trim() !== "") &&
-      Object.values(error).every((err) => err === "")
+      Object.values(formState).every(
+        (value) => value === "" || value === null || value.trim() !== ""
+      ) && Object.values(error).every((err) => err === "")
     );
   };
 
-  const insertData = async () => {
+  const saveData = async () => {
     const data = {
+      QuestionID: formState.questionId,
       QuestionName: formState.questionName,
     };
 
     try {
-      await axios.post("InsertQuestion", data, {
+      await axios.post("SaveQuestion", data, {
         headers: { "Content-Type": "application/json" },
       });
-      setFormState({ questionName: "" });
-      setError({ questionName: "" });
+      setFormState({ questionId: null, questionName: null });
+      setError({});
       const response = await axios.post("GetQuestions");
       setQuestion(response.data || []);
     } catch (error) {
-      console.error("Error inserting data:", error);
+      console.error("Error saving data:", error);
+    }
+  };
+
+  const handleAction = async (action, item) => {
+    try {
+      if (action === "edit") {
+        const response = await axios.post("GetQuestion", { QuestionID: item });
+        const questionData = response.data[0] || {};
+
+        setFormState({
+          questionId: questionData.QuestionID || null,
+          questionName: questionData.QuestionName || null,
+        });
+      } else if (action === "del") {
+        const response1 = await axios.post("DeleteQuestion", {
+          QuestionID: item,
+        });
+        const response2 = await axios.post("GetQuestions");
+        setQuestion(response2.data || []);
+      }
+    } catch (error) {
+      console.error("Error fetching question data:", error);
     }
   };
 
@@ -90,7 +113,7 @@ const QuestionForm = () => {
             label="Question Name"
             disabledInputStyle={styles.containerInput}
             value={formState.questionName}
-            onChangeText={(text) => handleInputChange("questionName", text)}
+            onChangeText={(text) => handleChange("questionName", text)}
           />
           {error.questionName ? (
             <Text style={styles.errorText}>{error.questionName}</Text>
@@ -101,7 +124,7 @@ const QuestionForm = () => {
             type="outline"
             containerStyle={styles.containerButton}
             disabled={!isFormValid()}
-            onPress={insertData}
+            onPress={saveData}
           />
         </Card>
 
@@ -112,6 +135,7 @@ const QuestionForm = () => {
             Tablehead={tableHead}
             editIndex={1}
             delIndex={2}
+            handleAction={handleAction}
           />
         </Card>
       </ScrollView>
