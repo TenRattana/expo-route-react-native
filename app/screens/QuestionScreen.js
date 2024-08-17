@@ -1,4 +1,4 @@
-import { StyleSheet, SafeAreaView, ScrollView, Text } from "react-native";
+import { StyleSheet, SafeAreaView, ScrollView, Text, View } from "react-native";
 import React, { useState, useEffect } from "react";
 import axios from "../../config/axios";
 import { Button, Card, Input } from "@rneui/themed";
@@ -13,6 +13,7 @@ const QuestionForm = () => {
     questionName: null,
   });
   const [error, setError] = useState({});
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -49,10 +50,20 @@ const QuestionForm = () => {
 
   const isFormValid = () => {
     return (
-      Object.values(formState).every(
-        (value) => value === "" || value === null || value.trim() !== ""
-      ) && Object.values(error).every((err) => err === "")
+      Object.keys(formState).every((key) => {
+        const value = formState[key];
+        if (!isEditing && key === "machineId") {
+          return true;
+        }
+        return value !== "" && value !== null && String(value).trim() !== "";
+      }) && Object.values(error).every((err) => err === "")
     );
+  };
+
+  const resetForm = () => {
+    setFormState({ questionId: null, questionName: null });
+    setError({});
+    setIsEditing(false);
   };
 
   const saveData = async () => {
@@ -69,6 +80,7 @@ const QuestionForm = () => {
       setError({});
       const response = await axios.post("GetQuestions");
       setQuestion(response.data || []);
+      setIsEditing(true);
     } catch (error) {
       console.error("Error saving data:", error);
     }
@@ -119,13 +131,21 @@ const QuestionForm = () => {
             <Text style={styles.errorText}>{error.questionName}</Text>
           ) : null}
 
-          <Button
-            title="Create"
-            type="outline"
-            containerStyle={styles.containerButton}
-            disabled={!isFormValid()}
-            onPress={saveData}
-          />
+          <View style={styles.buttonContainer}>
+            <Button
+              title="Create"
+              type="outline"
+              containerStyle={styles.containerButton}
+              disabled={!isFormValid()}
+              onPress={saveData}
+            />
+            <Button
+              title="Reset"
+              type="outline"
+              containerStyle={styles.containerButton}
+              onPress={resetForm}
+            />
+          </View>
         </Card>
 
         <Card>
@@ -144,6 +164,11 @@ const QuestionForm = () => {
 };
 
 const styles = StyleSheet.create({
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+  },
   containerButton: {
     width: 200,
     marginVertical: 10,

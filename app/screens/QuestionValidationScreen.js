@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, SafeAreaView, ScrollView, Text } from "react-native";
+import { StyleSheet, SafeAreaView, ScrollView, Text, View } from "react-native";
 import axios from "../../config/axios";
 import { Button, Card, Input } from "@rneui/themed";
 import { colors, spacing } from "../../theme";
@@ -11,7 +11,6 @@ const QuestionValidationScreen = () => {
   const [rule, setRule] = useState([]);
   const [validationRule, setValidationRule] = useState([]);
   const [formState, setFormState] = useState({
-    
     machineGroupId: null,
     machineName: null,
     displayOrder: null,
@@ -23,6 +22,7 @@ const QuestionValidationScreen = () => {
     displayOrder: "",
     description: "",
   });
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -66,12 +66,28 @@ const QuestionValidationScreen = () => {
 
   const isFormValid = () => {
     return (
-      Object.values(formState).every((value) => String(value).trim() !== "") &&
-      Object.values(error).every((err) => err === "")
+      Object.keys(formState).every((key) => {
+        const value = formState[key];
+        if (!isEditing && key === "machineId") {
+          return true;
+        }
+        return value !== "" && value !== null && String(value).trim() !== "";
+      }) && Object.values(error).every((err) => err === "")
     );
   };
 
-  const insertData = async () => {
+  const resetForm = () => {
+    setFormState({
+      machineGroupId: "",
+      machineName: "",
+      displayOrder: "",
+      description: "",
+    });
+    setError({});
+    setIsEditing(false);
+  };
+
+  const saveData = async () => {
     const data = {
       MachineGroupID: formState.machineGroupId,
       MachineName: formState.machineName,
@@ -181,13 +197,21 @@ const QuestionValidationScreen = () => {
             <Text style={styles.errorText}>{error.description}</Text>
           ) : null}
 
-          <Button
-            title="Create"
-            type="outline"
-            containerStyle={styles.containerButton}
-            disabled={!isFormValid()}
-            onPress={insertData}
-          />
+           <View style={styles.buttonContainer}>
+            <Button
+              title="Create"
+              type="outline"
+              containerStyle={styles.containerButton}
+              disabled={!isFormValid()}
+              onPress={saveData}
+            />
+            <Button
+              title="Reset"
+              type="outline"
+              containerStyle={styles.containerButton}
+              onPress={resetForm}
+            />
+          </View>
         </Card>
 
         <Card>
@@ -211,6 +235,11 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
   },
   containerButton: {
     width: 200,

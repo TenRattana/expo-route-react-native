@@ -1,4 +1,4 @@
-import { StyleSheet, SafeAreaView, ScrollView, Text } from "react-native";
+import { StyleSheet, SafeAreaView, ScrollView, Text, View } from "react-native";
 import React, { useState, useEffect } from "react";
 import axios from "../../config/axios";
 import { Button, Card, Input } from "@rneui/themed";
@@ -14,6 +14,7 @@ const ValidationScreen = () => {
     ruleValue: null,
   });
   const [error, setError] = useState({});
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -52,10 +53,20 @@ const ValidationScreen = () => {
 
   const isFormValid = () => {
     return (
-      Object.values(formState).every(
-        (value) => value === "" || value === null || value.trim() !== ""
-      ) && Object.values(error).every((err) => err === "")
+      Object.keys(formState).every((key) => {
+        const value = formState[key];
+        if (!isEditing && key === "machineId") {
+          return true;
+        }
+        return value !== "" && value !== null && String(value).trim() !== "";
+      }) && Object.values(error).every((err) => err === "")
     );
+  };
+
+  const resetForm = () => {
+    setFormState({ ruleId: null, ruleName: null, ruleValue: null });
+    setError({});
+    setIsEditing(false);
   };
 
   const saveData = async () => {
@@ -138,13 +149,21 @@ const ValidationScreen = () => {
             <Text style={styles.errorText}>{error.ruleValue}</Text>
           ) : null}
 
-          <Button
-            title="Create"
-            type="outline"
-            containerStyle={styles.containerButton}
-            disabled={!isFormValid()}
-            onPress={saveData}
-          />
+          <View style={styles.buttonContainer}>
+            <Button
+              title="Create"
+              type="outline"
+              containerStyle={styles.containerButton}
+              disabled={!isFormValid()}
+              onPress={saveData}
+            />
+            <Button
+              title="Reset"
+              type="outline"
+              containerStyle={styles.containerButton}
+              onPress={resetForm}
+            />
+          </View>
         </Card>
 
         <Card>
@@ -163,6 +182,11 @@ const ValidationScreen = () => {
 };
 
 const styles = StyleSheet.create({
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+  },
   containerButton: {
     width: 200,
     marginVertical: 10,
