@@ -8,6 +8,7 @@ const QuestionDetailScreen = lazy(() => import('./screens/QuestionDetailScreen')
 const ValidationScreen = lazy(() => import('./screens/ValidationScreen'));
 const QuestionOptionScreen = lazy(() => import('./screens/QuestionOptionScreen'));
 const QuestionValidationScreen = lazy(() => import('./screens/QuestionValidationScreen'));
+import ViewFormScreen from "./screens/Form/ViewFormScreem";
 
 const Drawer = createDrawerNavigator();
 
@@ -22,6 +23,7 @@ const Index = () => {
         <Drawer.Screen name="Detail Question" component={QuestionDetailScreen} />
         <Drawer.Screen name="Validation" component={ValidationScreen} />
         <Drawer.Screen name="Match Validation" component={QuestionValidationScreen} />
+        <Drawer.Screen name="View Form" component={ViewFormScreen} />
       </Drawer.Navigator>
     </Suspense>
   );

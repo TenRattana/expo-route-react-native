@@ -70,7 +70,7 @@ const QuestionDetailScreen = () => {
     return (
       Object.keys(formState).every((key) => {
         const value = formState[key];
-        if (!isEditing && key === "machineId") {
+        if (!isEditing && key === "mqotionId") {
           return true;
         }
         return value !== "" && value !== null && String(value).trim() !== "";
@@ -160,7 +160,7 @@ const QuestionDetailScreen = () => {
     const o = option.find((group) => group.OptionID === item.OptionID);
 
     return [
-      item.MOptionID,
+      item.MQOptionID,
       q ? q.QuestionName : "",
       o ? o.OptionName : "",
       item.Description,

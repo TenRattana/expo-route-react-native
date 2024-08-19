@@ -68,7 +68,7 @@ const QuestionValidationScreen = () => {
     return (
       Object.keys(formState).every((key) => {
         const value = formState[key];
-        if (!isEditing && key === "machineId") {
+        if (!isEditing && key === "machineGroupId") {
           return true;
         }
         return value !== "" && value !== null && String(value).trim() !== "";
