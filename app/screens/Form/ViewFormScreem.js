@@ -117,6 +117,8 @@ const ViewFormScreen = () => {
 
   return (
     <ScrollView style={styles.container}>
+          <Text style={styles.sectionHead}>{form[0].FormName}</Text>
+
       {form.map((item, index) => (
         <View key={index} style={styles.section}>
           <Text style={styles.sectionTitle}>{item.CardName}</Text>
@@ -132,7 +134,7 @@ const ViewFormScreen = () => {
                 style={[
                   styles.gridItem,
                   {
-                    flexBasis: `${100 / item.CardColumns}%`,
+                    flexBasis: `${90 / item.CardColumns}%`,
                     flexGrow: field.DisplayOrder,
                   },
                 ]}
@@ -152,7 +154,6 @@ const ViewFormScreen = () => {
       ))}
       <Button
         title="Submit"
-        type="outline"
         onPress={handleSubmit}
         containerStyle={styles.containerButton}
       />
@@ -163,9 +164,20 @@ const ViewFormScreen = () => {
 const styles = StyleSheet.create({
   container: {
     padding: 20,
+    marginBottom: 30
   },
   section: {
+    padding:'2%',
     marginBottom: 20,
+    borderRadius: 5,
+    backgroundColor: "white",
+  },
+  sectionHead: {
+    fontSize: 24,
+    fontWeight: "bold",
+    alignSelf: "center",
+    marginVertical: 5,
+    marginBottom: 20
   },
   sectionTitle: {
     fontSize: 18,
@@ -201,6 +213,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     marginHorizontal: 50,
     alignSelf: "center",
+    marginBottom: 20
   },
 });
 

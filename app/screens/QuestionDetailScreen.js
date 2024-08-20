@@ -3,7 +3,11 @@ import React, { useState, useEffect } from "react";
 import axios from "../../config/axios";
 import { Button, Card, Input } from "@rneui/themed";
 import { colors, spacing } from "../../theme";
-import { CustomTable , CustomDropdown } from "../components";
+import {
+  CustomTable,
+  CustomDropdown,
+  CustomDropdownMulti,
+} from "../components";
 import validator from "validator";
 
 const QuestionDetailScreen = () => {
@@ -14,7 +18,7 @@ const QuestionDetailScreen = () => {
     mqotionId: null,
     moptionId: null,
     questionId: null,
-    optionId: null,
+    optionId: [],
     displayOrder: null,
     description: null,
   });
@@ -45,7 +49,7 @@ const QuestionDetailScreen = () => {
 
   const handleChange = (fieldName, value) => {
     let errorMessage = "";
-
+    
     if (fieldName === "description" && validator.isEmpty(value.trim())) {
       errorMessage = "The Description field is required.";
     } else if (
@@ -200,7 +204,7 @@ const QuestionDetailScreen = () => {
             <Text style={styles.errorText}>{error.questionId}</Text>
           ) : null}
 
-          <CustomDropdown
+          <CustomDropdownMulti
             fieldName="optionId"
             title="Option"
             label="Option"
